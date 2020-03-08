@@ -1,4 +1,5 @@
 clear;
+clc;
 
 MAC = 80.98; %[in]
 X_MAC = 261.56; %[in]
@@ -52,11 +53,37 @@ AC_rampmass = AC_ramp(2)/lb_unit;
 
 %%%%%%%%%%%Fuel as function of time%%%%%%%%%
 
-FuelDat = readtable('FuelCG.dat');
+FuelDat = load('FuelCG.dat');
+FuelDat(:,2) = FuelDat(:,2) .* 100;
+RefData = load('RefData.mat');
+time = RefData.flightdata.time.data;
+FU_left = RefData.flightdata.lh_engine_FU.data;
+FU_right = RefData.flightdata.rh_engine_FU.data;
 
-plot(FuelDat(1), FuelDat(2));
+%Find function y = ax + b from data
+global p;
+p = polyfit(FuelDat(:,1), FuelDat(:,2), 1);
+
+%Mass and cg of ac as function of time
+t = 9;
+AC_mass_t = AC_ramp(2) - FU(t);
+CGdatum_t = (AC_zerofuel(3) + FU_moment(AC_fuel(2) - FU(t)))/(AC_zerofuel(2) + (AC_fuel(2) - FU(t)));
 
 
+function cgx = FU_moment(mass)
+    global p;
+    cgx = p(1)*mass + p(2);
+end
 
+function i = idx(t)
+    global time;
+    i = find(time==round(t, 1));
+end
 
+function mass = FU(t)
+    global FU_left;
+    global FU_right;
+
+    mass = FU_left(idx(t)) + FU_right(idx(t));
+end
 
