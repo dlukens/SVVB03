@@ -3,7 +3,6 @@ clear;
 MAC = 80.98; %[in]
 X_MAC = 261.56; %[in]
 lb_unit = 2.20462262185;
-in_unit = 39.37007874;
 
 %Weights
 
@@ -43,9 +42,8 @@ AC_fuel = [285.5, 4100, 1170550];
 AC_ramp = AC_zerofuel + AC_fuel;
 AC_ramp(1) = AC_ramp(3)/AC_ramp(2);
 
-X_cg = (AC_ramp(1) - X_MAC); %[in]
+X_cg = (AC_ramp(1) - X_MAC)/lb_unit; %[m]
 X_cg_chordpercent = X_cg/MAC * 100;
-X_cg = X_cg/in_unit; %[m]
 
 
 
