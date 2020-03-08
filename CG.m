@@ -47,6 +47,8 @@ X_cg = (AC_ramp(1) - X_MAC); %[in]
 X_cg_chordpercent = X_cg/MAC * 100;
 X_cg = X_cg/in_unit; %[m]
 
+disp(X_cg);
+
 
 
 
