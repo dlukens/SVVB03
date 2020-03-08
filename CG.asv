@@ -54,7 +54,7 @@ AC_rampmass = AC_ramp(2)/lb_unit;
 
 FuelDat = readtable('FuelCG.dat');
 
-plot(FuelDat(1), FuelDat(2));
+plot(FuelDat);
 
 
 
