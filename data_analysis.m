@@ -1,10 +1,13 @@
+file = '20200305_V1.xlsx';
+
 %INPUT constants + Vc, hp, mf1, mf2, TAT 
-Vc      = [251 221 190 161 134 121] / 1.9438444924574;          %[m/s]
-hp      = [5030 5030 5020 5040 5040 5030] * 0.3048;             %[m]
-mf1     = [770 638 533 444 420 420]/(3600*2.2046226218488);     %[kg/s]
-mf2     = [806 670 579 488 450 450]/(3600*2.2046226218488);     %[kg/s]
-TAT     = [10.2 7.8 5 4 2.2 1.5];                               %[K]
+Vc      = readmatrix(file,'Range','E28:E33') / 1.9438444924574;          %[m/s]
+hp      = readmatrix(file,'Range','D28:D33') * 0.3048;             %[m]
+mf1     = readmatrix(file,'Range','G28:G33')/(3600*2.2046226218488);     %[kg/s]
+mf2     = readmatrix(file,'Range','H28:H33')/(3600*2.2046226218488);     %[kg/s]
+TAT     = readmatrix(file,'Range','J28:J33');                               %[K]
 gamma   = 1.4;
+Dinlet  = 0.686;                                                %[m]
 
 
 % Constant values concerning atmosphere and gravity
@@ -22,10 +25,14 @@ deltaT = zeros(1,length(Vc));
 Vt = zeros(1,length(Vc));
 Ve = zeros(1,length(Vc));
 
+%atmospheric conditions
+p = zeros(1,length(Vc));
+rho = zeros(1,length(Vc));
+
 for idx = 1:length(Vc)
     %calculating Mach number
-    p = p0*(1+(lambda*hp(idx))/Temp0)^(g/(lambda*R));
-    M(idx) = sqrt(2/(gamma-1)*((1+p0/p*((1+((gamma-1)*rho0*Vc(idx)^2)/(2*gamma*p0))^(gamma/(gamma-1))-1))^((gamma-1)/gamma)-1));
+    p(idx) = p0*(1+(lambda*hp(idx))/Temp0)^(g/(lambda*R));
+    M(idx) = sqrt(2/(gamma-1)*((1+p0/p(idx)*((1+((gamma-1)*rho0*Vc(idx)^2)/(2*gamma*p0))^(gamma/(gamma-1))-1))^((gamma-1)/gamma)-1));
     %calculating temperature
     TISA = Temp0+lambda*hp(idx);
     Tm = TAT(idx) + TISA;
@@ -34,8 +41,8 @@ for idx = 1:length(Vc)
     %calculating Vt and Ve
     a = sqrt(gamma*R*T(idx));
     Vt(idx) = M(idx)*a;
-    rho = p/(R*T(idx));
-    Ve(idx) = Vt(idx)*sqrt(rho/rho0);
+    rho(idx) = p(idx)/(R*T(idx));
+    Ve(idx) = Vt(idx)*sqrt(rho(idx)/rho0);
 end
 
 thrust_inputs = zeros(6,5);
@@ -52,5 +59,9 @@ save matlab.dat thrust_inputs -ascii
 system('thrust.exe &');
 %reading results
 Thrust = importdata('thrust.dat');
-
+%calculating thrust coefficients
+Tc = zeros(1,length(Thrust));
+for idx = 1:length(Thrust)
+   Tc(idx) = (Thrust(idx,1)+Thrust(idx,2))/(0.5*rho(idx)*Vt(idx)^2*Dinlet^2);
+end
 
