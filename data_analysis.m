@@ -16,13 +16,13 @@ g       = 9.81;            % [m/sec^2] (gravity constant)
 p0      = 101325;          % [Pa]
 
 %OUTPUTS
-M = zeros(1,6);
-T = zeros(1,6);
-deltaT = zeros(1,6);
-Vt = zeros(1,6);
-Ve = zeros(1,6);
+M = zeros(1,length(Vc));
+T = zeros(1,length(Vc));
+deltaT = zeros(1,length(Vc));
+Vt = zeros(1,length(Vc));
+Ve = zeros(1,length(Vc));
 
-for idx = 1:6
+for idx = 1:length(Vc)
     %calculating Mach number
     p = p0*(1+(lambda*hp(idx))/Temp0)^(g/(lambda*R));
     M(idx) = sqrt(2/(gamma-1)*((1+p0/p*((1+((gamma-1)*rho0*Vc(idx)^2)/(2*gamma*p0))^(gamma/(gamma-1))-1))^((gamma-1)/gamma)-1));
@@ -41,8 +41,16 @@ end
 thrust_inputs = zeros(6,5);
 thrust_inputs(:,1) = transpose(hp);
 thrust_inputs(:,2) = transpose(M);
-thrust_inputs(:,3) = transpose(mf1);
-thrust_inputs(:,4) = transpose(mf2);
-thrust_inputs(:,5) = transpose(deltaT);
+thrust_inputs(:,4) = transpose(mf1);
+thrust_inputs(:,5) = transpose(mf2);
+thrust_inputs(:,3) = transpose(deltaT);
+
+%THRUST CALCULATION
+%saving to matlab.dat
+save matlab.dat thrust_inputs -ascii
+%running thrust.exe
+system('thrust.exe &');
+%reading results
+Thrust = importdata('thrust.dat');
 
 
