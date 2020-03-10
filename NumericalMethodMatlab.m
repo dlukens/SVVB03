@@ -163,6 +163,9 @@ sys_asym = ss(A_asym,B_asym,C,D);
 sys_sym = ss(A_sym,B_sym,C,D);
 y_asym = impulse(sys_asym,t);
 y_sym = impulse(sys_sym,t);
-plot(t,y_asym(:,2))
+
+figure(1)
+plot(t,y_asym(:,1,1),t,y_asym(:,1,2))
+figure(2)
 plot(t,y_sym(:,2))
 
