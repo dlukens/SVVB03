@@ -1,4 +1,4 @@
-file = '20200305_V1.xlsx';
+file = 'RefStationaryData.xlsx';
 
 %INPUT constants + Vc, hp, mf1, mf2, TAT 
 Vc      = readmatrix(file,'Range','E28:E33') / 1.9438444924574;          %[m/s]
