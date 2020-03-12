@@ -5,6 +5,8 @@ MAC = 80.98; %[in]
 X_MAC = 261.56; %[in]
 lb_unit = 2.20462262185;
 in_unit = 39.37007874;
+F_init = 4100;
+%F_init = 4050;
 
 %Weights
 
@@ -17,6 +19,17 @@ Lorenza6 = [251, 64];
 Paula7  = [288, 74];
 Luis8 = [288, 99];
 Marta10 = [170, 60];
+
+%%%Reference Data
+% Chipke1 = [131, 95];
+% Hans2 = [131, 92];
+% Gabriel3 = [214, 66];
+% Carlos4 = [214, 61];
+% Diego5 = [251, 75];
+% Lorenza6 = [251, 78];
+% Paula7  = [288, 86];
+% Luis8 = [288, 68];
+% Marta10 = [170, 74];
 
 %Matrix with weights[kg] and xcgdatum[in]
 W = [Chipke1; Hans2; Gabriel3; Carlos4; Diego5; Lorenza6; Paula7; Luis8; Marta10];
@@ -38,18 +51,18 @@ AC_zerofuel = AC_payload + AC_empty;
 AC_zerofuel(1) = AC_zerofuel(3)/AC_zerofuel(2);
 
 %Fuel load
-AC_fuel = [285.5, 4100, 1170550];
+AC_fuel = [285.5, F_init, 1170550];
 
 %AC Ramp mass (X_cgdatum[in], mass[lb], moment[in-lb])
 AC_ramp = AC_zerofuel + AC_fuel;
 AC_ramp(1) = AC_ramp(3)/AC_ramp(2);
 
-X_cg = (AC_ramp(1) - X_MAC); %[in]
+X_cg = AC_ramp(1) - X_MAC; %[in]
 X_cg_chordpercent = X_cg/MAC * 100;
-X_cg = X_cg/in_unit; %[m]
+X_cg_m = X_cg/in_unit; %[m]
 
 %AC mass[kg] at ramp
-AC_rampmass = AC_ramp(2)/lb_unit;
+AC_rampmass_kg = AC_ramp(2)/lb_unit;
 
 %%%%%%%%%%%Fuel as function of time%%%%%%%%%
 
@@ -66,9 +79,8 @@ p = polyfit(FuelDat(:,1), FuelDat(:,2), 1);
 
 %Mass and cg of ac as function of time
 t = 9;
-AC_mass_t = AC_ramp(2) - FU(t);
-CGdatum_t = (AC_zerofuel(3) + FU_moment(AC_fuel(2) - FU(t)))/(AC_zerofuel(2) + (AC_fuel(2) - FU(t)));
-
+AC_mass_t = F_init - FU(t);
+CGdatum_t = (AC_zerofuel(3) + FU_moment(AC_fuel(2) - FU(t)))/(AC_zerofuel(2) + (F_init - FU(t)));
 
 function cgx = FU_moment(mass)
     global p;
