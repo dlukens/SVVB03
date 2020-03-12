@@ -164,8 +164,22 @@ sys_sym = ss(A_sym,B_sym,C,D);
 y_asym = impulse(sys_asym,t);
 y_sym = impulse(sys_sym,t);
 
+%Assymetric Flight
 figure(1)
+subplot(4,1,1)
 plot(t,y_asym(:,1,1),t,y_asym(:,1,2))
+grid()
+
+subplot(4,2,1)
+plot(t,y_asym(:,2,1),t,y_asym(:,2,2))
+grid()
+
+subplot(4,2,1)
+plot(t,y_asym(:,2,1),t,y_asym(:,2,2))
+grid()
+
+%Symmetric Flight
 figure(2)
 plot(t,y_sym(:,2))
+grid()
 
