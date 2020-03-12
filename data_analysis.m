@@ -4,25 +4,25 @@ file = 'RefStationaryData.xlsx';
 %INPUT constants + Vc, hp, mf1, mf2, TAT 
 
 Vc      = readmatrix(file,'Range','E28:E33').' / 1.9438444924574;         %[m/s] CL-CD
-% Vc      = readmatrix(file,'Range','E59:E65') / 1.9438444924574;         %[m/s] Trim
+% Vc      = readmatrix(file,'Range','E59:E65').' / 1.9438444924574;         %[m/s] Trim
 
 hp      = readmatrix(file,'Range','D28:D33').' * 0.3048;                  %[m] CL-CD
-% hp      = readmatrix(file,'Range','D59:D65') * 0.3048;                  %[m] Trim
+% hp      = readmatrix(file,'Range','D59:D65').' * 0.3048;                  %[m] Trim
 
 mf1     = readmatrix(file,'Range','G28:G33').'/(3600*2.2046226218488);    %[kg/s] CL-CD
-% mf1     = readmatrix(file,'Range','J59:J65')/(3600*2.2046226218488);    %[kg/s] Trim
+% mf1     = readmatrix(file,'Range','J59:J65').'/(3600*2.2046226218488);    %[kg/s] Trim
 
 mf2     = readmatrix(file,'Range','H28:H33').'/(3600*2.2046226218488);    %[kg/s] CL-CD
-% mf2     = readmatrix(file,'Range','K59:K65')/(3600*2.2046226218488);    %[kg/s] Trim
+% mf2     = readmatrix(file,'Range','K59:K65').'/(3600*2.2046226218488);    %[kg/s] Trim
 
 TAT     = readmatrix(file,'Range','J28:J33').';                           %[K] CL-CD
-% TAT     = readmatrix(file,'Range','M59:M65');                           %[K] Trim
+% TAT     = readmatrix(file,'Range','M59:M65').';                           %[K] Trim
 
 mfused  = readmatrix(file,'Range','I28:I33').'/(2.2046226218488);         %[kg] CL-CD
-% mfused  = readmatrix(file,'Range','L59:L65')/(2.2046226218488);         %[kg] Trim
+% mfused  = readmatrix(file,'Range','L59:L65').'/(2.2046226218488);         %[kg] Trim
 
 alpha   = readmatrix(file,'Range','F28:F33').';                           %[deg] CL-CD
-% alpha   = readmatrix(file,'Range','F59:F65');                           %[deg] Trim
+% alpha   = readmatrix(file,'Range','F59:F65').';                           %[deg] Trim
 
 gamma   = 1.4;
 Dinlet  = 0.691;                                                        %[m]
@@ -51,6 +51,8 @@ Ve = zeros(1,length(Vc));
 %atmospheric conditions
 p = zeros(1,length(Vc));
 rho = zeros(1,length(Vc));
+
+%%
 
 for idx = 1:length(Vc)
     %calculating Mach number
@@ -88,10 +90,14 @@ for idx = 1:length(Thrust)
    Tc(idx) = (Thrust(idx,1)+Thrust(idx,2))/(0.5*rho(idx)*Vt(idx)^2*pi*((Dinlet)^2)/4);
 end
 
+%%
+
 %drag coefficient
 C_D = Tc*(Dinlet^2/S^2);
 %lift coefficient
 C_L = (minit*ones(1,length(Vc))-mfused)*g./(0.5*rho.*Vt.^2*S);
 
-plot(alpha,C_L)
+% plot(alpha,C_L)
 CL_vs_alpha = polyfit(alpha,C_L,1);
+CLa_deg = CL_vs_alpha(1)
+CLa_rad = CL_vs_alpha(1)*pi/180
