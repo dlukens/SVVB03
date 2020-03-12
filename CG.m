@@ -79,7 +79,7 @@ FU_right = RefData.flightdata.rh_engine_FU.data;
 global p;
 p = polyfit(FuelDat(:,1), FuelDat(:,2), 1);
 
-%Mass and cg of ac as function of time
+%Mass and cg of ac as function of time [lb], [in]
 t = 9;
 AC_mass_t = AC_zerofuel(2) + F_init - FU(t);
 CGdatum_t = (AC_zerofuel(3) + F_moment(AC_fuel(2) - FU(t)))/(AC_zerofuel(2) + (F_init - FU(t)));
