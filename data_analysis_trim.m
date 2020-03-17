@@ -10,6 +10,8 @@ mf2     = readmatrix(file,'Range','K59:K65').'/(3600*2.2046226218488);    %[kg/s
 TAT     = readmatrix(file,'Range','M59:M65').';                           %[K] Trim
 mfused  = readmatrix(file,'Range','L59:L65').'/(2.2046226218488);         %[kg] Trim
 alpha   = readmatrix(file,'Range','F59:F65').';                           %[deg] Trim
+de_meas = readmatrix(file,'Range','G59:G65').';                           %[deg] Trim
+Fe      = readmatrix(file,'Range','I59:I65').';                           %[deg] Trim
 
 gamma   = 1.4;
 Dinlet  = 0.691;                                                        %[m]
@@ -40,6 +42,10 @@ Ve = zeros(1,length(Vc));
 %atmospheric conditions
 p = zeros(1,length(Vc));
 rho = zeros(1,length(Vc));
+
+%standard values
+mfs = 0.048; %kg/s per engine
+ms = 60500/g; %kg
 
 %% Tc
 
@@ -81,10 +87,33 @@ end
 
 %% REDUCING VARIABLES
 
-ms = 60500/g;
+% EQUIVALENT VELOCITY
 
-% Equivalent velocity
 Ve = Vt.*sqrt(rho/rho0);
-Vehat = Ve.*sqrt(ms/(minit-mfused));
+Vehat = Ve.*sqrt(ms./(minit-mfused));
 
-% Standard Thrust Coeff
+% REDUCED ELEVATOR DEFLECTION
+Cmde = 1;
+CmTc = -0.0064;
+
+thrust_inputs(:,4) = mfs*ones(length(Vc),1);
+thrust_inputs(:,5) = mfs*ones(length(Vc),1);
+%Thrust Calculation
+%saving to matlab.dat
+save matlab.dat thrust_inputs -ascii
+%running thrust.exe
+system('thrust.exe &');
+%reading results
+ThrustS = importdata('thrust.dat');
+%calculating standard thrust coefficients
+Tcs = zeros(1,length(ThrustS));
+for idx = 1:length(ThrustS)
+   Tcs(idx) = (ThrustS(idx,1)+ThrustS(idx,2))/(0.5*rho(idx)*Vt(idx)^2*pi*((Dinlet)^2)/4);
+end
+de_star = de_meas-(CmTc)/Cmde.*(Tcs-Tc);
+
+%REDUCED ELEVATOR FORCE
+Fe_star = Fe.*sqrt(ms./(minit-mfused));
+
+
+

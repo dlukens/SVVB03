@@ -1,5 +1,5 @@
-% file = 'RefStationaryData.xlsx';
-file = '20200305_V1.xlsx';
+file = 'RefStationaryData.xlsx';
+% file = '20200305_V1.xlsx';
 
 %INPUT constants + Vc, hp, mf1, mf2, TAT 
 
@@ -88,9 +88,8 @@ C_L = (minit*ones(1,length(Vc))-mfused)*g./(0.5*rho.*Vt.^2*S);
 
 % plot(alpha,C_L)
 % plot(C_L,C_D)
-CL_vs_alpha = polyfit(alpha,C_L,1);
-alpha0_deg = -CL_vs_alpha(2)/CL_vs_alpha(1);
-alpha0_rad = alpha0_deg*pi/180;
+CL_vs_alpha = polyfit(alpha,C_L,1)
+alpha0 = 0;
 CLa_deg = CL_vs_alpha(1);
 CLa_rad = CL_vs_alpha(1)*180/pi;
 
