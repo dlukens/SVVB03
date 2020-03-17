@@ -3,20 +3,21 @@ file = 'RefStationaryData.xlsx';
 
 %INPUT constants + Vc, hp, mf1, mf2, TAT 
 
-Vc      = readmatrix(file,'Range','E59:E65').' / 1.9438444924574;         %[m/s] Trim
-hp      = readmatrix(file,'Range','D59:D65').' * 0.3048;                  %[m] Trim
-mf1     = readmatrix(file,'Range','J59:J65').'/(3600*2.2046226218488);    %[kg/s] Trim
-mf2     = readmatrix(file,'Range','K59:K65').'/(3600*2.2046226218488);    %[kg/s] Trim
-TAT     = readmatrix(file,'Range','M59:M65').';                           %[K] Trim
-mfused  = readmatrix(file,'Range','L59:L65').'/(2.2046226218488);         %[kg] Trim
-alpha   = readmatrix(file,'Range','F59:F65').';                           %[deg] Trim
-de_meas = readmatrix(file,'Range','G59:G65').';                           %[deg] Trim
-Fe      = readmatrix(file,'Range','I59:I65').';                           %[deg] Trim
+Vc      = readmatrix(file,'Range','E75:E76').' / 1.9438444924574;         %[m/s] Trim
+hp      = readmatrix(file,'Range','D75:D76').' * 0.3048;                  %[m] Trim
+mf1     = readmatrix(file,'Range','J75:J76').'/(3600*2.2046226218488);    %[kg/s] Trim
+mf2     = readmatrix(file,'Range','K75:K76').'/(3600*2.2046226218488);    %[kg/s] Trim
+TAT     = readmatrix(file,'Range','M75:M76').';                           %[K] Trim
+mfused  = readmatrix(file,'Range','L75:L76').'/(2.2046226218488);         %[kg] Trim
+alpha   = readmatrix(file,'Range','F75:F76').';                           %[deg] Trim
+de_meas = readmatrix(file,'Range','G75:G76').';                           %[deg] Trim
+Fe      = readmatrix(file,'Range','I75:I76').';                           %[deg] Trim
 
 gamma   = 1.4;
-Dinlet  = 0.691;                                                        %[m]
-S       = 30;                                                           %[m^2]
-b       = 15.911;                                                           %[m^2]
+Dinlet  = 0.691;                                                          %[m]
+chord   = 2.0569;                                                         %[m]
+S       = 30;                                                             %[m^2]
+b       = 15.911;                                                         %[m^2]
 A       = b^2/S;
 g       = 9.81;                                                         %[m/sec^2] (gravity constant)
 
@@ -57,7 +58,7 @@ for idx = 1:length(Vc)
     TISA = Temp0+lambda*hp(idx);
     Tm = TAT(idx) + 273.15;
     T(idx) = Tm/(1+((gamma-1)/2)*M(idx)^2);
-    deltaT(idx) = -T(idx)+TISA;
+    deltaT(idx) = T(idx)-TISA;
     %calculating Vt and Ve
     a = sqrt(gamma*R*T(idx));
     Vt(idx) = M(idx)*a;
@@ -84,6 +85,15 @@ Tc = zeros(1,length(Thrust));
 for idx = 1:length(Thrust)
    Tc(idx) = (Thrust(idx,1)+Thrust(idx,2))/(0.5*rho(idx)*Vt(idx)^2*pi*((Dinlet)^2)/4);
 end
+
+%% CMDE AND CMA
+xcg1 = 7.1477; %reference data
+xcg2 = 7.1051; %reference data
+CN2 = ((minit-mfused(2))*g)/(0.5*rho(2)*Vt(2)^2*S);
+CN1 = ((minit-mfused(1))*g)/(0.5*rho(1)*Vt(1)^2*S);
+
+Cmde = -1/(de_meas(2)*pi/180-de_meas(1)*pi/180)*(CN2*xcg2-CN1*xcg1)/(chord)
+
 
 %% REDUCING VARIABLES
 

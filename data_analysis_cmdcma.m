@@ -3,18 +3,21 @@ file = 'RefStationaryData.xlsx';
 
 %INPUT constants + Vc, hp, mf1, mf2, TAT 
 
-Vc      = readmatrix(file,'Range','E28:E33').' / 1.9438444924574;         %[m/s] CL-CD
-hp      = readmatrix(file,'Range','D28:D33').' * 0.3048;                  %[m] CL-CD
-mf1     = readmatrix(file,'Range','G28:G33').'/(3600*2.2046226218488);    %[kg/s] CL-CD
-mf2     = readmatrix(file,'Range','H28:H33').'/(3600*2.2046226218488);    %[kg/s] CL-CD
-TAT     = readmatrix(file,'Range','J28:J33').';                           %[K] CL-CD
-mfused  = readmatrix(file,'Range','I28:I33').'/(2.2046226218488);         %[kg] CL-CD
-alpha   = readmatrix(file,'Range','F28:F33').';                           %[deg] CL-CD
+Vc      = readmatrix(file,'Range','E75:E76').' / 1.9438444924574;         %[m/s] Trim
+hp      = readmatrix(file,'Range','D75:D76').' * 0.3048;                  %[m] Trim
+mf1     = readmatrix(file,'Range','J75:J76').'/(3600*2.2046226218488);    %[kg/s] Trim
+mf2     = readmatrix(file,'Range','K75:K76').'/(3600*2.2046226218488);    %[kg/s] Trim
+TAT     = readmatrix(file,'Range','M75:M76').';                           %[K] Trim
+mfused  = readmatrix(file,'Range','L75:L76').'/(2.2046226218488);         %[kg] Trim
+alpha   = readmatrix(file,'Range','F75:F76').';                           %[deg] Trim
+de_meas = readmatrix(file,'Range','G75:G76').';                           %[deg] Trim
+Fe      = readmatrix(file,'Range','I75:I76').';                           %[deg] Trim
 
 gamma   = 1.4;
-Dinlet  = 0.691;                                                        %[m]
-S       = 30;                                                           %[m^2]
-b       = 15.911;                                                           %[m^2]
+Dinlet  = 0.691;                                                          %[m]
+chord   = 2.0569;                                                         %[m]
+S       = 30;                                                             %[m^2]
+b       = 15.911;                                                         %[m^2]
 A       = b^2/S;
 g       = 9.81;                                                         %[m/sec^2] (gravity constant)
 
@@ -41,6 +44,10 @@ Ve = zeros(1,length(Vc));
 p = zeros(1,length(Vc));
 rho = zeros(1,length(Vc));
 
+%standard values
+mfs = 0.048; %kg/s per engine
+ms = 60500/g; %kg
+
 %% Tc
 
 for idx = 1:length(Vc)
@@ -51,7 +58,7 @@ for idx = 1:length(Vc)
     TISA = Temp0+lambda*hp(idx);
     Tm = TAT(idx) + 273.15;
     T(idx) = Tm/(1+((gamma-1)/2)*M(idx)^2);
-    deltaT(idx) = -T(idx)+TISA;
+    deltaT(idx) = T(idx)-TISA;
     %calculating Vt and Ve
     a = sqrt(gamma*R*T(idx));
     Vt(idx) = M(idx)*a;
@@ -79,24 +86,17 @@ for idx = 1:length(Thrust)
    Tc(idx) = (Thrust(idx,1)+Thrust(idx,2))/(0.5*rho(idx)*Vt(idx)^2*pi*((Dinlet)^2)/4);
 end
 
-%% CL AND CD
+%% CMDE
+xcg1 = 7.1477; %reference data
+xcg2 = 7.1051; %reference data
+CN2 = ((minit-mfused(2))*g)/(0.5*rho(2)*Vt(2)^2*S);
+CN1 = ((minit-mfused(1))*g)/(0.5*rho(1)*Vt(1)^2*S);
 
-%drag coefficient
-C_D = Tc*((pi*(Dinlet^2)/4)/S);
-%lift coefficient
-C_L = (minit*ones(1,length(Vc))-mfused)*g./(0.5*rho.*Vt.^2*S);
+Cmde = -1/(de_meas(2)*pi/180-de_meas(1)*pi/180)*(CN2*xcg2-CN1*xcg1)/(chord);
 
-% plot(alpha,C_L)
-% plot(C_L,C_D)
-CL_vs_alpha = polyfit(alpha,C_L,1)
-alpha0 = 0;
-CLa_deg = CL_vs_alpha(1);
-CLa_rad = CL_vs_alpha(1)*180/pi;
+%% CMA
+alpha_der   = readmatrix(file,'Range','F59:F65').';                           %[deg] Trim
+de_meas_der = readmatrix(file,'Range','G59:G65').';                           %[deg] Trim
+slope_for_cma = polyfit(alpha_der,de_meas_der,1);
 
-% plot(C_L.^2,C_D);
-CD_vs_CLsq = polyfit(C_L.^2,C_D,1);
-CD0 = CD_vs_CLsq(2);
-e = 1/(pi*A*CD_vs_CLsq(1));
-
-
-
+Cma = -slope_for_cma(1)*Cmde;
