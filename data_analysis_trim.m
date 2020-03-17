@@ -3,23 +3,23 @@ file = 'RefStationaryData.xlsx';
 
 %INPUT constants + Vc, hp, mf1, mf2, TAT 
 
-Vc      = readmatrix(file,'Range','E75:E76').' / 1.9438444924574;         %[m/s] Trim
-hp      = readmatrix(file,'Range','D75:D76').' * 0.3048;                  %[m] Trim
-mf1     = readmatrix(file,'Range','J75:J76').'/(3600*2.2046226218488);    %[kg/s] Trim
-mf2     = readmatrix(file,'Range','K75:K76').'/(3600*2.2046226218488);    %[kg/s] Trim
-TAT     = readmatrix(file,'Range','M75:M76').';                           %[K] Trim
-mfused  = readmatrix(file,'Range','L75:L76').'/(2.2046226218488);         %[kg] Trim
-alpha   = readmatrix(file,'Range','F75:F76').';                           %[deg] Trim
-de_meas = readmatrix(file,'Range','G75:G76').';                           %[deg] Trim
-Fe      = readmatrix(file,'Range','I75:I76').';                           %[deg] Trim
+Vc      = readmatrix(file,'Range','E59:E65').' / 1.9438444924574;         %[m/s] Trim
+hp      = readmatrix(file,'Range','D59:D65').' * 0.3048;                  %[m] Trim
+mf1     = readmatrix(file,'Range','J59:J65').'/(3600*2.2046226218488);    %[kg/s] Trim
+mf2     = readmatrix(file,'Range','K59:K65').'/(3600*2.2046226218488);    %[kg/s] Trim
+TAT     = readmatrix(file,'Range','M59:M65').';                           %[K] Trim
+mfused  = readmatrix(file,'Range','L59:L65').'/(2.2046226218488);         %[kg] Trim
+alpha   = readmatrix(file,'Range','F59:F65').';                           %[deg] Trim
+de_meas = readmatrix(file,'Range','G59:G65').';                           %[deg] Trim
+Fe      = readmatrix(file,'Range','I59:I65').';                           %[deg] Trim
 
 gamma   = 1.4;
-Dinlet  = 0.691;                                                          %[m]
+Dinlet  = 0.686;                                                          %[m]
 chord   = 2.0569;                                                         %[m]
 S       = 30;                                                             %[m^2]
 b       = 15.911;                                                         %[m^2]
 A       = b^2/S;
-g       = 9.81;                                                         %[m/sec^2] (gravity constant)
+g       = 9.80665;                                                         %[m/sec^2] (gravity constant)
 
 % total mass
 minit   = 6689.2;                                  %[kg] reference
@@ -83,17 +83,8 @@ Thrust = importdata('thrust.dat');
 %calculating thrust coefficients
 Tc = zeros(1,length(Thrust));
 for idx = 1:length(Thrust)
-   Tc(idx) = (Thrust(idx,1)+Thrust(idx,2))/(0.5*rho(idx)*Vt(idx)^2*pi*((Dinlet)^2)/4);
+   Tc(idx) = (Thrust(idx,1)+Thrust(idx,2))/(0.5*rho(idx)*Vt(idx)^2*((Dinlet)^2));
 end
-
-%% CMDE AND CMA
-xcg1 = 7.1477; %reference data
-xcg2 = 7.1051; %reference data
-CN2 = ((minit-mfused(2))*g)/(0.5*rho(2)*Vt(2)^2*S);
-CN1 = ((minit-mfused(1))*g)/(0.5*rho(1)*Vt(1)^2*S);
-
-Cmde = -1/(de_meas(2)*pi/180-de_meas(1)*pi/180)*(CN2*xcg2-CN1*xcg1)/(chord)
-
 
 %% REDUCING VARIABLES
 
@@ -105,9 +96,8 @@ Vehat = Ve.*sqrt(ms./(minit-mfused));
 % REDUCED ELEVATOR DEFLECTION
 Cmde = 1;
 CmTc = -0.0064;
-
-thrust_inputs(:,4) = mfs*ones(length(Vc),1);
-thrust_inputs(:,5) = mfs*ones(length(Vc),1);
+thrust_inputs(:,4) = mfs.*ones(length(Vc),1);
+thrust_inputs(:,5) = mfs.*ones(length(Vc),1);
 %Thrust Calculation
 %saving to matlab.dat
 save matlab.dat thrust_inputs -ascii
@@ -118,7 +108,7 @@ ThrustS = importdata('thrust.dat');
 %calculating standard thrust coefficients
 Tcs = zeros(1,length(ThrustS));
 for idx = 1:length(ThrustS)
-   Tcs(idx) = (ThrustS(idx,1)+ThrustS(idx,2))/(0.5*rho(idx)*Vt(idx)^2*pi*((Dinlet)^2)/4);
+   Tcs(idx) = (ThrustS(idx,1)+ThrustS(idx,2))/(0.5*rho(idx)*Vt(idx)^2*((Dinlet)^2));
 end
 de_star = de_meas-(CmTc)/Cmde.*(Tcs-Tc);
 
