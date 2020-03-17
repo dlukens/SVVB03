@@ -5,9 +5,9 @@
 % Stationary flight condition
 
 hp0    = 5030*0.3048;      	  % pressure altitude in the stationary flight condition [m]
-V0     = 77;            % true airspeed in the stationary flight condition [m/sec]
-alpha0 = 1.6;       	      % angle of attack in the stationary flight condition [rad]
-th0    = alpha0;        % pitch angle in the stationary flight condition [rad]
+V0     = 90; %174.1*0.51444;            % true airspeed in the stationary flight condition [m/sec]
+alpha0 = 5.5*pi/180;       	      % angle of attack in the stationary flight condition [rad]
+th0    = 4.285*pi/180;        % pitch angle in the stationary flight condition [rad]
 
 % Aircraft mass
 %m      = 6720 ;         	  % mass [kg] Nuestro
@@ -15,9 +15,9 @@ m      =  6689.13;         	  % mass [kg] Reference
 
 
 % aerodynamic properties
-e      = 0.8;            % Oswald factor [ ]
-CD0    = 0.04;            % Zero lift drag coefficient [ ]
-CLa    = 5.084;            % Slope of CL-alpha curve [ ]
+e      = 0.7384;            % Oswald factor [ ]
+CD0    = 0.0204;            % Zero lift drag coefficient [ ]
+CLa    = 4.6248;            % Slope of CL-alpha curve [ ]
 
 % Longitudinal stability
 Cma    = -0.5626;            % longitudinal stabilty [ ]
@@ -27,7 +27,7 @@ Cmde   = -1.1642;            % elevator effectiveness [ ]
 
 S      = 30.00;	          % wing area [m^2]
 Sh     = 0.2*S;           % stabiliser area [m^2]
-Sh_S   = Sh/S;	          % [ ]
+Sh_S   = Sh/S;	          % [ ]5
 lh     = 0.71*5.968;      % tail length [m]
 c      = 2.0569;	  % mean aerodynamic cord [m]
 lh_c   = lh/c;	          % [ ]
@@ -158,7 +158,7 @@ B_asym = -inv(C1_asym)*C3_asym;
 C = eye(4);
 D = 0;
 
-t = 0:0.001:10;
+t = 0:0.001:170;
 sys_asym = ss(A_asym,B_asym,C,D);
 sys_sym = ss(A_sym,B_sym,C,D);
 y_asym = impulse(sys_asym,t);
@@ -170,16 +170,51 @@ subplot(4,1,1)
 plot(t,y_asym(:,1,1),t,y_asym(:,1,2))
 grid()
 
-subplot(4,2,1)
+subplot(4,1,2)
 plot(t,y_asym(:,2,1),t,y_asym(:,2,2))
 grid()
 
-subplot(4,2,1)
-plot(t,y_asym(:,2,1),t,y_asym(:,2,2))
+subplot(4,1,3)
+plot(t,y_asym(:,3,1),t,y_asym(:,3,2))
+grid()
+
+subplot(4,1,4)
+plot(t,y_asym(:,4,1),t,y_asym(:,4,2))
 grid()
 
 %Symmetric Flight
 figure(2)
+subplot(4,1,1)
+plot(t,y_sym(:,1))
+grid()
+
+subplot(4,1,2)
 plot(t,y_sym(:,2))
 grid()
+
+subplot(4,1,3)
+plot(t,y_sym(:,3))
+grid()
+
+subplot(4,1,4)
+plot(t,y_sym(:,4))
+grid()
+
+%Validation
+
+%u = [];
+
+%for i = 1:size(y_sym(:,1))
+%    ui = y_sym(i,1)/cos(y_sym(i,3)-y_sym(i,2));
+%    u(i) = ui;
+%end
+
+%load('FlightData.mat')
+
+%figure(3)
+%subplot(2,1,1)
+%plot(t,y_sym(:,3),flightdata.time.data(1,30111:31741)-flightdata.time.data(1,30111),flightdata.Ahrs1_Pitch.data(30111:31741,1)*pi/180)
+%plot(t,u,flightdata.time.data(1,30111:31741)-flightdata.time.data(1,30111),flightdata.Dadc1_tas.data(30111:31741,1)*0.514444)
+%grid()
+
 
