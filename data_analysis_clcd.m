@@ -87,14 +87,15 @@ C_D = Tc*((pi*(Dinlet^2)/4)/S);
 C_L = (minit*ones(1,length(Vc))-mfused)*g./(0.5*rho.*Vt.^2*S);
 
 % plot(alpha,C_L)
+% plot(C_L,C_D)
 CL_vs_alpha = polyfit(alpha,C_L,1);
-CLa_deg = CL_vs_alpha(1);
+CLa_deg = CL_vs_alpha(1)
 CLa_rad = CL_vs_alpha(1)*180/pi;
 
-plot(C_L.^2,C_D);
+% plot(C_L.^2,C_D);
 CD_vs_CLsq = polyfit(C_L.^2,C_D,1);
 CD0 = CD_vs_CLsq(2);
-e = 1/(pi*A*CD_vs_CLsq(1)); 
+e = 1/(pi*A*CD_vs_CLsq(1));
 
 
 

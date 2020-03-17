@@ -85,6 +85,6 @@ ms = 60500/g;
 
 % Equivalent velocity
 Ve = Vt.*sqrt(rho/rho0);
-Vehat = Ve.*sqrt(ms/minit);
+Vehat = Ve.*sqrt(ms/(minit-mfused));
 
-% 
+% Standard Thrust Coeff
