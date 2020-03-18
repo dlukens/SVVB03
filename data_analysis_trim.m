@@ -94,7 +94,7 @@ Ve = Vt.*sqrt(rho/rho0);
 Vehat = Ve.*sqrt(ms./(minit-mfused));
 
 % REDUCED ELEVATOR DEFLECTION
-Cmde = 1;
+Cmde = -1.71913836452277;
 CmTc = -0.0064;
 thrust_inputs(:,4) = mfs.*ones(length(Vc),1);
 thrust_inputs(:,5) = mfs.*ones(length(Vc),1);
@@ -115,5 +115,27 @@ de_star = de_meas-(CmTc)/Cmde.*(Tcs-Tc);
 %REDUCED ELEVATOR FORCE
 Fe_star = Fe.*sqrt(ms./(minit-mfused));
 
+%% PLOTS
+%CHECK THAT SORT() IS STILL VALID!!!!
+
+figure(1)
+deltavsve = plot(sort(Vehat),sort(de_star),'g');
+deltavsve.Marker='*';
+set(gca, 'YDir','reverse');
+annotation('arrow',[0.15 0.15],[0.3 0.15]);
+title('Elevator Delfection vs Airspeed (all values standardized)');
+xlabel('$$\tilde{V}_e$$ [$$\frac{m}{s}$$]','Interpreter','Latex');
+ylabel('$$\delta_{e_{eq}}^{*}$$ [ ]','Interpreter','Latex');
+grid on
+
+figure(2)
+fevsve = plot(sort(Vehat),sort(Fe_star),'m');
+fevsve.Marker='*';
+set(gca, 'YDir','reverse');
+annotation('arrow',[0.15 0.15],[0.3 0.15]);
+title('Elevator Stick Force vs Airspeed (all values standardized)');
+xlabel('$$\tilde{V}_e$$ [$$\frac{m}{s}$$]','Interpreter','Latex');
+ylabel('$$F_e^*$$ [N]','Interpreter','Latex');
+grid on
 
 
