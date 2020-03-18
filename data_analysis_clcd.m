@@ -1,5 +1,5 @@
-% file = 'RefStationaryData.xlsx';
-file = '20200305_V1.xlsx';
+file = 'RefStationaryData.xlsx';
+% file = '20200305_V1.xlsx';
 
 %INPUT constants + Vc, hp, mf1, mf2, TAT 
 
@@ -12,7 +12,7 @@ mfused  = readmatrix(file,'Range','I28:I33').'/(2.2046226218488);         %[kg] 
 alpha   = readmatrix(file,'Range','F28:F33').';                           %[deg] CL-CD
 
 gamma   = 1.4;
-Dinlet  = 0.691;                                                        %[m]
+Dinlet  = 0.686;                                                        %[m]
 S       = 30;                                                           %[m^2]
 b       = 15.911;                                                           %[m^2]
 A       = b^2/S;
@@ -27,7 +27,7 @@ rho0    = 1.2250;          % air density at sea level [kg/m^3]
 lambda  = -0.0065;         % temperature gradient in ISA [K/m]
 Temp0   = 288.15;          % temperature at sea level in ISA [K]
 R       = 287.05;          % specific gas constant [m^2/sec^2K]
-g       = 9.81;            % [m/sec^2] (gravity constant)
+g       = 9.80665;            % [m/sec^2] (gravity constant)
 p0      = 101325;          % [Pa]
 
 %OUTPUTS
@@ -51,7 +51,7 @@ for idx = 1:length(Vc)
     TISA = Temp0+lambda*hp(idx);
     Tm = TAT(idx) + 273.15;
     T(idx) = Tm/(1+((gamma-1)/2)*M(idx)^2);
-    deltaT(idx) = -T(idx)+TISA;
+    deltaT(idx) = T(idx)-TISA;
     %calculating Vt and Ve
     a = sqrt(gamma*R*T(idx));
     Vt(idx) = M(idx)*a;
