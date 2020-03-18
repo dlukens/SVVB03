@@ -209,7 +209,7 @@ load('FlightData.mat')
 
 figure(3)
 %subplot(2,1,1)
-plot(t,y_sym(:,3)+alpha0,flightdata.time.data(1,30111:31741)-flightdata.time.data(1,30111),flightdata.Ahrs1_Pitch.data(30111:31741,1)*pi/180)
+%plot(t,y_sym(:,3)+alpha0,flightdata.time.data(1,30111:31741)-flightdata.time.data(1,30111),flightdata.Ahrs1_Pitch.data(30111:31741,1)*pi/180)
 %plot(t,y_sym(:,1)+V0,flightdata.time.data(1,30111:31741)-flightdata.time.data(1,30111),flightdata.Dadc1_tas.data(30111:31741,1)*0.51444)
 
 grid()
