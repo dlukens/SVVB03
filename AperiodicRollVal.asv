@@ -1,13 +1,18 @@
 % Citation 550 - Linear simulation
-
+% Aperiodic Roll
 % xcg = 0.25*c
 
 % Stationary flight condition
 
+load('FlightData.mat')
+
+start = find(flightdata.time.data==3233);
+finish = find(flightdata.time.data==3274);
+
 hp0    = 5030*0.3048;      	  % pressure altitude in the stationary flight condition [m]
-V0     = 90; %174.1*0.51444;            % true airspeed in the stationary flight condition [m/sec]
-alpha0 = 5.5*pi/180;       	      % angle of attack in the stationary flight condition [rad]
-th0    = 4.39444349167663*pi/180;        % pitch angle in the stationary flight condition [rad]
+V0     = flightdata.Dadc1_tas.data(start,1)*0.51444;            % true airspeed in the stationary flight condition [m/sec]
+alpha0 = flightdata.vane_AOA.data(start,1)*pi/180 - (-0.0189);       	      % angle of attack in the stationary flight condition [rad]
+th0    = flightdata.Ahrs1_Pitch.data(start,1)*pi/180;        % pitch angle in the stationary flight condition [rad]
 
 % Aircraft mass
 m      = 6720;         	  % mass [kg] Nuestro
@@ -56,7 +61,7 @@ mub    = m/(rho*S*b);
 KX2    = 0.019;
 KZ2    = 0.042;
 KXZ    = 0.002;
-KY2    = 1.25*1.114;
+KY2    = 1.3925;
 
 % Aerodynamic constants
 
@@ -158,59 +163,20 @@ B_asym = -inv(C1_asym)*C3_asym;
 C = eye(4);
 D = 0;
 
-t = flightdata.time.data(1,30111:31741)-flightdata.time.data(1,30111);
-sys_asym = ss(A_asym,B_asym,C,D);
-sys_sym = ss(A_sym,B_sym,C,D);
-y_asym = impulse(sys_asym,t);
-%y_sym = impulse(sys_sym,t);
-u_de = (flightdata.delta_e.data(30111:31741,1)*pi/180)';
-%x0 = [V0,alpha0,th0,0];
-y_sym = lsim(sys_sym,u_de,t);
+t = flightdata.time.data(1,start:finish)-flightdata.time.data(1,start);
 
-%Assymetric Flight
-% figure(1)
-% subplot(4,1,1)
-% plot(t,y_asym(:,1,1),t,y_asym(:,1,2))
-% grid()
-% 
-% subplot(4,1,2)
-% plot(t,y_asym(:,2,1),t,y_asym(:,2,2))
-% grid()
-% 
-% subplot(4,1,3)
-% plot(t,y_asym(:,3,1),t,y_asym(:,3,2))
-% grid()
-% 
-% subplot(4,1,4)
-% plot(t,y_asym(:,4,1),t,y_asym(:,4,2))
-% grid()
-% 
-% %Symmetric Flight
-% figure(2)
-% subplot(4,1,1)
-% plot(t,y_sym(:,1))
-% grid()
-% 
-% subplot(4,1,2)
-% plot(t,y_sym(:,2))
-% grid()
-% 
-% subplot(4,1,3)
-% plot(t,y_sym(:,3))
-% grid()
-% 
-% subplot(4,1,4)
-% plot(t,y_sym(:,4))
-% grid()
+sys_asym = ss(A_asym,B_asym,C,D);
+u_da = (-(flightdata.delta_a.data(start:finish,1)-flightdata.delta_a.data(start,1))*pi/180)';
+u_dr = (-(flightdata.delta_r.data(start:finish,1)*pi/180))';
+%x0 = [V0,alpha0,th0,0];
+
+y_asym = lsim(sys_asym,[u_da;zeros(finish-start+1,1)'],t);
 
 %Validation
 
-load('FlightData.mat')
-
-figure(3)
-%subplot(2,1,1)
-plot(t,y_sym(:,3)+alpha0,flightdata.time.data(1,30111:31741)-flightdata.time.data(1,30111),flightdata.Ahrs1_Pitch.data(30111:31741,1)*pi/180)
-%plot(t,y_sym(:,1)+V0,flightdata.time.data(1,30111:31741)-flightdata.time.data(1,30111),flightdata.Dadc1_tas.data(30111:31741,1)*0.51444)
+figure(1)
+plot(t,y_asym(:,2)+flightdata.Ahrs1_bYawRate.data(start:finish,1)*pi/180,flightdata.time.data(1,start:finish)-flightdata.time.data(1,start),flightdata.Ahrs1_bYawRate.data(start:finish,1)*pi/180)
+%Roll
+%plot(t,y_asym(:,2)+flightdata.Ahrs1_Roll.data(start,1)*pi/180,flightdata.time.data(1,start:finish)-flightdata.time.data(1,start),flightdata.Ahrs1_Roll.data(start:finish,1)*pi/180)
 
 grid()
-
