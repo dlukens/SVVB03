@@ -1,5 +1,5 @@
-file = 'RefStationaryData.xlsx';
-% file = '20200305_V1.xlsx';
+% file = 'RefStationaryData.xlsx';
+file = '20200305_V1.xlsx';
 
 %INPUT constants + Vc, hp, mf1, mf2, TAT 
 
@@ -22,8 +22,8 @@ A       = b^2/S;
 g       = 9.81;                                                         %[m/sec^2] (gravity constant)
 
 % total mass
-minit   = 6689.2;                                  %[kg] reference
-% minit   = 6719.9;                                   %[kg] test
+% minit   = 6689.2;                                  %[kg] reference
+minit   = 6719.9;                                   %[kg] test
 
 % Constant values concerning atmosphere and gravity
 rho0    = 1.2250;          % air density at sea level [kg/m^3] 
@@ -87,10 +87,10 @@ for idx = 1:length(Thrust)
 end
 
 %% CMDE
-xcg1 = 7.1477; %reference data
-% xcg1 = 7.1539; %flight data
-xcg2 = 7.1051; %reference data
-% xcg2 = 7.0925; %flight data
+% xcg1 = 7.1477; %reference data
+xcg1 = 7.1539; %flight data
+% xcg2 = 7.1051; %reference data
+xcg2 = 7.0925; %flight data
 CN2 = ((minit-mfused(2))*g)/(0.5*rho(2)*Vt(2)^2*S);
 CN1 = ((minit-mfused(1))*g)/(0.5*rho(1)*Vt(1)^2*S);
 
