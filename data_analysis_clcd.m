@@ -131,7 +131,7 @@ annotation('textbox',dim,'String',str,'FitBoxToText','on');
 title('Drag Coefficient vs Lift Coefficient');
 xlabel('$$C_L$$ [ ]','Interpreter','Latex');
 ylabel('$$C_D$$ [ ]','Interpreter','Latex');
-legend({'Flight Data','Quadratic Regression'},'Location','northwest')
+legend({'Flight Data','Lift Squared Regression'},'Location','northwest')
 grid on
 
 
