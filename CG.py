@@ -5,9 +5,6 @@ from scipy import interpolate
 FlightData = scipy.io.loadmat('FlightData.mat')
 RefData = scipy.io.loadmat('RefData.mat')
 
-
-MAC = 80.98 #[in]
-X_MAC = 261.56 #[in]
 lb2kg = 2.20462262185
 m2in = 39.37007874
 
@@ -42,7 +39,7 @@ Wb[7][0] = 134./m2in
 
 # W[:, 0] = W[:, 0]/m2in
 # Wb = np.array(W)
-# Wb[7][0] = 134./m2in
+# Wb[7][0] = 170./m2in
 
 #Add moment column
 W = np.hstack((W, np.atleast_2d(W[:, 0]*W[:, 1]).T))
@@ -75,10 +72,21 @@ AC_rampb = AC_zerofuelb + AC_fuel
 
 ###Fuel as funtion of time
 
-F_usedt1 = 881/lb2kg
-F_usedt2 = 910/lb2kg
+#for ref data
+# F_usedt1 = 881/lb2kg
+# F_usedt2 = 910/lb2kg
+
+#for flight data
+F_usedt1 = 846/lb2kg
+F_usedt2 = 871/lb2kg
+
 
 x_CG1 = (AC_ramp[1] - F_moment(F_usedt1))/(AC_ramp[0] - F_usedt1)
 x_CG2 = (AC_rampb[1] - F_moment(F_usedt2))/(AC_rampb[0] - F_usedt2)
 
 diff = x_CG1 - x_CG2
+
+
+# F_used = 790/lb2kg
+# Mass = AC_ramp[0] - F_used
+# x_CG = (AC_ramp[1] - F_moment(F_used))/(AC_ramp[0] - F_used)
