@@ -12,7 +12,7 @@ mfused  = readmatrix(file,'Range','I28:I33').'/(2.2046226218488);         %[kg] 
 alpha   = readmatrix(file,'Range','F28:F33').';                           %[deg] CL-CD
 
 gamma   = 1.4;
-dyn_visc= 1.7387652e-05;
+dyn_v
 Dinlet  = 0.686;                                                        %[m]
 chord   = 2.0569;                                                       %[m]
 S       = 30;                                                           %[m^2]
@@ -101,15 +101,14 @@ CD_vs_CLsq = polyfit(C_L.^2,C_D,1);
 CD0 = CD_vs_CLsq(2);
 e = 1/(pi*A*CD_vs_CLsq(1));
 
-Re = Vt*chord./dyn_visc;
+Re = Vt*chord./
 
 %plots
 figure(1)
 clvsa = plot(alpha,C_L);
-plot
 clvsa.Marker='*';
-dim = [0.5 0.12 0.5 0.11];
-str = {'Mach range: 0.4148-0.2005','Re range: (1.6280 - 0.7848) e07'};
+dim = [0.2 0.5 0.3 0.3];
+str = {'Mach range 0.4148-0.2005','Reynolds number range '};
 annotation('textbox',dim,'String',str,'FitBoxToText','on');
 title('Lift Coefficient vs Angle of Attack');
 xlabel('$$\alpha$$ [deg]','Interpreter','Latex');
@@ -119,9 +118,6 @@ grid on
 figure(2)
 clvscd = plot(C_L,C_D,'r');
 clvscd.Marker='*';
-dim = [0.5 0.12 0.5 0.11];
-str = {'Mach range: 0.4148-0.2005','Re range: (1.6280 - 0.7848) e07'};
-annotation('textbox',dim,'String',str,'FitBoxToText','on');
 title('Drag Coefficient vs Lift Coefficient');
 xlabel('$$C_L$$ [ ]','Interpreter','Latex');
 ylabel('$$C_D$$ [ ]','Interpreter','Latex');
