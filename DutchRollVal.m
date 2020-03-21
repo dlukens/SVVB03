@@ -10,7 +10,7 @@ alpha0 = 5.3608*pi/180 - (-0.0189);       	      % angle of attack in the statio
 th0    = 3.239*pi/180;        % pitch angle in the stationary flight condition [rad]
 
 % Aircraft mass
-m      = 6720;         	  % mass [kg] Nuestro
+m      = 6720-(flightdata.lh_engine_FU.data(finish,1)+flightdata.rh_engine_FU.data(finish,1))*0.453592;
 %m      =  6689.13;         	  % mass [kg] Reference
 
 
@@ -20,8 +20,8 @@ CD0    = 0.0215;            % Zero lift drag coefficient [ ]
 CLa    = 4.4079;            % Slope of CL-alpha curve [ ]
 
 % Longitudinal stability
-Cma    = -0.78;            % longitudinal stabilty [ ]
-Cmde   = -1.7197;            % elevator effectiveness [ ]
+Cma    = -0.7934;            % longitudinal stabilty [ ]
+Cmde   =  -1.7492;            % elevator effectiveness [ ]
 
 % Aircraft geometry
 
@@ -111,28 +111,6 @@ Cnda   =  -0.0120;
 Cndr   =  -0.0939;
 
 
-%%% Symmetric
-
-C1_sym = [-2*muc*c/(V0*V0), 0, 0, 0,;
-      0, (CZadot - 2*muc)*c/V0, 0, 0;
-      0, 0, -c/V0, 0;
-      0, Cmadot*c/V0, 0, -2*muc*KY2*c*c/(V0*V0)];
-
-
-C2_sym = [CXu/V0, CXa, CZ0, CXq*c/V0;
-      CZu/V0, CZa, -CX0, (CZq + 2*muc)*c/V0;
-      0,0,0,c/V0;
-      Cmu/V0, Cma, 0, Cmq*c/V0];
-
-
-C3_sym = [CXde;
-      CZde;
-      0;
-      Cmde];
-
-A_sym = -inv(C1_sym)*C2_sym;
-B_sym = -inv(C1_sym)*C3_sym;
-
 %%% Unsymmetric
 
 C1_asym = [(CYbdot - 2*mub)*b/V0,0,0,0;
@@ -174,6 +152,29 @@ y_asym = lsim(sys_asym,[u_da;u_dr],t);
 %Validation
 
 figure(1)
-plot(t,y_asym(:,4),flightdata.time.data(1,start:finish)-flightdata.time.data(1,start),flightdata.Ahrs1_bYawRate.data(start:finish,1)*pi/180)
 
+%Roll
+subplot(3,1,1)
+plot(t,y_asym(:,2),flightdata.time.data(1,start:finish)-flightdata.time.data(1,start),flightdata.Ahrs1_Roll.data(start:finish,1)*pi/180)
 grid()
+xlabel('Time [sec]')
+ylabel('Roll [rad]')
+legend('Simulation','Flight Test')
+
+%Roll Rate
+subplot(3,1,2)
+plot(t,y_asym(:,3),flightdata.time.data(1,start:finish)-flightdata.time.data(1,start),flightdata.Ahrs1_bYawRate.data(start:finish,1)*pi/180)
+grid()
+xlabel('Time [sec]')
+ylabel('Roll Rate [rad/s]')
+legend('Simulation','Flight Test')
+
+%Yaw Rate
+subplot(3,1,3)
+plot(t,y_asym(:,4),flightdata.time.data(1,start:finish)-flightdata.time.data(1,start),flightdata.Ahrs1_bYawRate.data(start:finish,1)*pi/180)
+grid()
+xlabel('Time [sec]')
+ylabel('Yaw Rate [rad/s]')
+legend('Simulation','Flight Test')
+
+suptitle('Dutch Roll Motion')

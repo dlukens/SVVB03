@@ -15,7 +15,7 @@ alpha0 = flightdata.vane_AOA.data(start,1)*pi/180 - (-0.0189);       	      % an
 th0    = flightdata.Ahrs1_Pitch.data(start,1)*pi/180;        % pitch angle in the stationary flight condition [rad]
 
 % Aircraft mass
-m      = 6720;         	  % mass [kg] Nuestro
+m      = 6720-(flightdata.lh_engine_FU.data(finish,1)+flightdata.rh_engine_FU.data(finish,1))*0.453592;
 %m      =  6689.13;         	  % mass [kg] Reference
 
 
@@ -25,8 +25,8 @@ CD0    = 0.0215;            % Zero lift drag coefficient [ ]
 CLa    = 4.4079;            % Slope of CL-alpha curve [ ]
 
 % Longitudinal stability
-Cma    = -0.78;            % longitudinal stabilty [ ]
-Cmde   = -1.7197;            % elevator effectiveness [ ]
+Cma    = -0.7934;            % longitudinal stabilty [ ]
+Cmde   =  -1.7492;            % elevator effectiveness [ ]
 
 % Aircraft geometry
 
@@ -167,14 +167,29 @@ t = flightdata.time.data(1,start:finish)-flightdata.time.data(1,start);
 
 sys_asym = ss(A_asym,B_asym,C,D);
 u_da = (-(flightdata.delta_a.data(start:finish,1)-flightdata.delta_a.data(start,1))*pi/180)';
-u_dr = (-(flightdata.delta_r.data(start:finish,1) - flightdata.delta_r.data(start,1))*pi/180)';
+u_dr = (-(flightdata.delta_r.data(start:finish,1)-3*flightdata.delta_r.data(start,1))*pi/180)';
 %x0 = [V0,alpha0,th0,0];
+
+dr_delta = [];
+
+for i = start:finish
+    dr_new = flightdata.delta_r.data(i+1,1)-flightdata.delta_r.data(i,1);
+    dr_delta = [dr_delta,dr_new];
+end
 
 y_asym = lsim(sys_asym,[u_da;u_dr],t);
 
 %Validation
 
 figure(1)
+%Roll Rate
 plot(t,y_asym(:,3),flightdata.time.data(1,start:finish)-flightdata.time.data(1,start),flightdata.Ahrs1_bRollRate.data(start:finish,1)*pi/180)
 
+%Yaw Rate
+%plot(t,y_asym(:,4),flightdata.time.data(1,start:finish)-flightdata.time.data(1,start),flightdata.Ahrs1_bYawRate.data(start:finish,1)*pi/180)
+
+%Roll
+%plot(t,y_asym(:,2),flightdata.time.data(1,start:finish)-flightdata.time.data(1,start),flightdata.Ahrs1_Roll.data(start:finish,1)*pi/180)
+
 grid()
+

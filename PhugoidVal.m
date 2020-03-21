@@ -6,8 +6,8 @@
 
 load('FlightData.mat')
 
-start = find(flightdata.time.data==3309);
-finish = find(flightdata.time.data==3329);
+start = find(flightdata.time.data==3015); % For reference: 3225
+finish = find(flightdata.time.data==3135); % For reference: 3358
 
 hp0    = 5030*0.3048;      	  % pressure altitude in the stationary flight condition [m]
 V0     = flightdata.Dadc1_tas.data(start,1)*0.51444;            % true airspeed in the stationary flight condition [m/sec]
@@ -20,25 +20,25 @@ m      = 6720-(flightdata.lh_engine_FU.data(finish,1)+flightdata.rh_engine_FU.da
 
 
 % aerodynamic properties
-e      = 0.9521;            % Oswald factor [ ]
+e      = 0.9521;            % Oswald factor [ ] 
 CD0    = 0.0215;            % Zero lift drag coefficient [ ]
 CLa    = 4.4079;            % Slope of CL-alpha curve [ ]
 
 % Longitudinal stability
-Cma    = -0.7934;            % longitudinal stabilty [ ]
-Cmde   =  -1.7492;            % elevator effectiveness [ ]
+Cma    = -0.6615;            % longitudinal stabilty [ ] -0.7249
+Cmde   =  -1.4584;            % elevator effectiveness [ ] -1.496
 
 % Aircraft geometry
 
 S      = 30.00;	          % wing area [m^2]
 Sh     = 0.2*S;           % stabiliser area [m^2]
-Sh_S   = Sh/S;	          % [ ]5
+Sh_S   = Sh/S;	          % [ ]
 lh     = 0.71*5.968;      % tail length [m]
 c      = 2.0569;	  % mean aerodynamic cord [m]
 lh_c   = lh/c;	          % [ ]
 b      = 15.911;	  % wing span [m]
 bh     = 5.791;	          % stabilser span [m]
-A_asym      = b^2/S;           % wing aspect ratio [ ]
+A_asym = b^2/S;           % wing aspect ratio [ ]
 Ah     = bh^2/Sh;         % stabilser aspect ratio [ ]
 Vh_V   = 1;		  % [ ]
 ih     = -2*pi/180;       % stabiliser angle of incidence [rad]
@@ -121,7 +121,7 @@ Cndr   =  -0.0939;
 C1_sym = [-2*muc*c/(V0*V0), 0, 0, 0,;
       0, (CZadot - 2*muc)*c/V0, 0, 0;
       0, 0, -c/V0, 0;
-      0, Cmadot*c/V0, 0, -2*muc*KY2*c*c/(V0*V0)];
+      0, Cmadot*c/V0, 0, -2*muc*KY2*c^2/(V0^2)];
 
 
 C2_sym = [CXu/V0, CXa, CZ0, CXq*c/V0;
@@ -138,27 +138,6 @@ C3_sym = [CXde;
 A_sym = -inv(C1_sym)*C2_sym;
 B_sym = -inv(C1_sym)*C3_sym;
 
-%%% Unsymmetric
-
-C1_asym = [(CYbdot - 2*mub)*b/V0,0,0,0;
-      0,-b/(2*V0),0,0;
-      0,0,-2*mub*KX2*b*b/(V0*V0),2*mub*KXZ*b*b/(V0*V0);
-      Cnbdot*b/V0,0,2*mub*KXZ*b*b/(V0*V0),-2*mub*KZ2*b*b/(V0*V0)];
-  
-  
-C2_asym = [CYb, CL, CYp*b/(2*V0), (CYr - 4*mub)*b/(2*V0);
-      0, 0, b/(2*V0), 0;
-      Clb, 0, Clp*b/(2*V0), Clr*b/(2*V0);
-      Cnb, 0, Cnp*b/(2*V0), Cnr*b/(2*V0)];
-  
-  
-C3_asym = [CYda, CYdr;
-       0,0;
-       Clda, Cldr;
-       Cnda, Cndr];
-   
-A_asym = -inv(C1_asym)*C2_asym;
-B_asym = -inv(C1_asym)*C3_asym;
 
 C = eye(4);
 D = 0;
@@ -170,19 +149,17 @@ u_de = (flightdata.delta_e.data(start:finish,1)*pi/180)';
 
 y_sym = lsim(sys_sym,u_de,t);
 
-
 %Validation
 
 figure(1)
 %Pitch
-%plot(t,y_sym(:,3)+flightdata.Ahrs1_Pitch.data(start,1)*pi/180,flightdata.time.data(1,start:finish)-flightdata.time.data(1,start),flightdata.Ahrs1_Pitch.data(start:finish,1)*pi/180)
+plot(t,y_sym(:,3)+0.08,flightdata.time.data(1,start:finish)-flightdata.time.data(1,start),flightdata.Ahrs1_Pitch.data(start:finish,1)*pi/180);
 
 %AoA
-plot(t,y_sym(:,2)+flightdata.vane_AOA.data(start,1)*pi/180,flightdata.time.data(1,start:finish)-flightdata.time.data(1,start),flightdata.vane_AOA.data(start:finish,1)*pi/180)
+% plot(t,y_sym(:,2)+flightdata.vane_AOA.data(start,1)*pi/180,flightdata.time.data(1,start:finish)-flightdata.time.data(1,start),flightdata.vane_AOA.data(start:finish,1)*pi/180)
 
 %u
-plot(t,y_sym(:,1)+flightdata.Dadc1_tas.data(start,1)*0.51444,flightdata.time.data(1,start:finish)-flightdata.time.data(1,start),flightdata.Dadc1_tas.data(start:finish,1)*0.51444)
+% plot(t,y_sym(:,1)+flightdata.Dadc1_tas.data(start,1)*0.51444,flightdata.time.data(1,start:finish)-flightdata.time.data(1,start),flightdata.Dadc1_tas.data(start:finish,1)*0.51444)
 
 %Pitch rate
-plot(t,y_sym(:,4)+flightdata.Ahrs1_bPitchRate.data(start,1)*pi/180,flightdata.time.data(1,start:finish)-flightdata.time.data(1,start),flightdata.Ahrs1_bPitchRate.data(start:finish,1)*pi/180)
-
+% plot(t,y_sym(:,4)+flightdata.Ahrs1_bPitchRate.data(start,1)*pi/180,flightdata.time.data(1,start:finish)-flightdata.time.data(1,start),flightdata.Ahrs1_bPitchRate.data(start:finish,1)*pi/180)

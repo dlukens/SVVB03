@@ -95,6 +95,7 @@ CN2 = ((minit-mfused(2))*g)/(0.5*rho(2)*Vt(2)^2*S);
 CN1 = ((minit-mfused(1))*g)/(0.5*rho(1)*Vt(1)^2*S);
 
 Cmde = -1/(de_meas(2)*pi/180-de_meas(1)*pi/180)*(CN2*xcg2-CN1*xcg1)/(chord);
+Cmde = -1.1;
 
 %% CMA
 alpha_der   = readmatrix(file,'Range','F59:F65').';                           %[deg] Trim
