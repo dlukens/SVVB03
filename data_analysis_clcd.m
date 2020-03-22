@@ -94,13 +94,13 @@ CL_vs_alpha = polyfit(alpha,C_L,1);
 alpha0_deg = -CL_vs_alpha(2)/CL_vs_alpha(1);
 alpha0_rad = alpha0_deg*pi/180;
 CLa_deg = CL_vs_alpha(1);
-CLa_rad = CL_vs_alpha(1)*180/pi;
+CLa_rad = CL_vs_alpha(1)*180/pi
 fitC_L = CLa_deg*alpha+CL_vs_alpha(2);
 
 % plot(C_L.^2,C_D);
 CD_vs_CLsq = polyfit(C_L.^2,C_D,1);
-CD0 = CD_vs_CLsq(2);
-e = 1/(pi*A*CD_vs_CLsq(1));
+CD0 = CD_vs_CLsq(2)
+e = 1/(pi*A*CD_vs_CLsq(1))
 fitC_D = CD_vs_CLsq(1).*C_L.^2+CD_vs_CLsq(2);
 
 Re = Vt*chord./dyn_visc;
