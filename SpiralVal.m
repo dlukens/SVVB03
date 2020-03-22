@@ -6,8 +6,8 @@
 
 load('FlightData.mat')
 
-start = find(flightdata.time.data==3620);
-finish = find(flightdata.time.data==3927);
+start = find(flightdata.time.data==3620); %For flight: 3620 For reference: 3922
+finish = find(flightdata.time.data==3854); %For flight: 3854 For reference: 4135
 
 hp0    = 5030*0.3048;      	  % pressure altitude in the stationary flight condition [m]
 V0     = flightdata.Dadc1_tas.data(start,1)*0.51444;            % true airspeed in the stationary flight condition [m/sec]
@@ -20,13 +20,13 @@ m      = 6720-(flightdata.lh_engine_FU.data(finish,1)+flightdata.rh_engine_FU.da
 
 
 % aerodynamic properties
-e      = 0.9521;            % Oswald factor [ ]
+e      = 0.9521;            % Oswald factor [ ] 
 CD0    = 0.0215;            % Zero lift drag coefficient [ ]
 CLa    = 4.4079;            % Slope of CL-alpha curve [ ]
 
 % Longitudinal stability
-Cma    = -0.7934;            % longitudinal stabilty [ ]
-Cmde   =  -1.7492;            % elevator effectiveness [ ]
+Cma    = -0.6615;            % longitudinal stabilty [ ] -0.7249
+Cmde   =  -1.4584;            % elevator effectiveness [ ] -1.496
 
 % Aircraft geometry
 
@@ -166,8 +166,8 @@ D = 0;
 t = flightdata.time.data(1,start:finish)-flightdata.time.data(1,start);
 
 sys_asym = ss(A_asym,B_asym,C,D);
-u_da = (-(flightdata.delta_a.data(start:finish,1)-flightdata.delta_a.data(start,1))*pi/180)';
-u_dr = (-(flightdata.delta_r.data(start:finish,1)-3*flightdata.delta_r.data(start,1))*pi/180)';
+u_da = (-(flightdata.delta_a.data(start:finish,1)-flightdata.delta_a.data(36001,1))*pi/180)';  %0.275 %0.315 %36001
+u_dr = (-(flightdata.delta_r.data(start:finish,1)-flightdata.delta_r.data(start,1))*pi/180)';
 %x0 = [V0,alpha0,th0,0];
 
 dr_delta = [];
@@ -180,16 +180,40 @@ end
 y_asym = lsim(sys_asym,[u_da;u_dr],t);
 
 %Validation
-
 figure(1)
-%Roll Rate
-plot(t,y_asym(:,3),flightdata.time.data(1,start:finish)-flightdata.time.data(1,start),flightdata.Ahrs1_bRollRate.data(start:finish,1)*pi/180)
+%Inputs
+subplot(5,1,1)
+plot(t,flightdata.delta_a.data(start:finish,1)*pi/180,'Color',[0.9100    0.4100    0.1700])
+grid()
+ylabel('\delta_a [rad]')
 
-%Yaw Rate
-%plot(t,y_asym(:,4),flightdata.time.data(1,start:finish)-flightdata.time.data(1,start),flightdata.Ahrs1_bYawRate.data(start:finish,1)*pi/180)
+subplot(5,1,2)
+plot(t,flightdata.delta_r.data(start:finish,1)*pi/180,'Color',[0.9100    0.4100    0.1700])
+grid()
+ylabel('\delta_r [rad]')
+
 
 %Roll
-%plot(t,y_asym(:,2),flightdata.time.data(1,start:finish)-flightdata.time.data(1,start),flightdata.Ahrs1_Roll.data(start:finish,1)*pi/180)
-
+subplot(5,1,3)
+plot(t,y_asym(:,2),flightdata.time.data(1,start:finish)-flightdata.time.data(1,start),flightdata.Ahrs1_Roll.data(start:finish,1)*pi/180)
 grid()
+ylabel('Roll [rad]')
+legend('Simulation','Flight Test')
+
+%Roll Rate
+subplot(5,1,4)
+plot(t,y_asym(:,3),flightdata.time.data(1,start:finish)-flightdata.time.data(1,start),flightdata.Ahrs1_bRollRate.data(start:finish,1)*pi/180)
+grid()
+ylabel('Roll Rate [rad/s]')
+
+
+%Yaw Rate
+subplot(5,1,5)
+plot(t,y_asym(:,4),flightdata.time.data(1,start:finish)-flightdata.time.data(1,start),flightdata.Ahrs1_bYawRate.data(start:finish,1)*pi/180)
+grid()
+xlabel('Time [sec]')
+ylabel('Yaw Rate [rad/s]')
+
+
+suptitle('Spiral Motion')
 

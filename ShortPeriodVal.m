@@ -20,13 +20,13 @@ m      = 6720-(flightdata.lh_engine_FU.data(finish,1)+flightdata.rh_engine_FU.da
 
 
 % aerodynamic properties
-e      = 0.9521;            % Oswald factor [ ]
+e      = 0.9521;            % Oswald factor [ ] 
 CD0    = 0.0215;            % Zero lift drag coefficient [ ]
 CLa    = 4.4079;            % Slope of CL-alpha curve [ ]
 
 % Longitudinal stability
-Cma    = -0.7934;            % longitudinal stabilty [ ]
-Cmde   =  -1.7492;            % elevator effectiveness [ ]
+Cma    = -0.6615;            % longitudinal stabilty [ ] -0.7249
+Cmde   =  -1.4584;            % elevator effectiveness [ ] -1.496
 
 % Aircraft geometry
 
@@ -138,27 +138,6 @@ C3_sym = [CXde;
 A_sym = -inv(C1_sym)*C2_sym;
 B_sym = -inv(C1_sym)*C3_sym;
 
-%%% Unsymmetric
-
-C1_asym = [(CYbdot - 2*mub)*b/V0,0,0,0;
-      0,-b/(2*V0),0,0;
-      0,0,-2*mub*KX2*b*b/(V0*V0),2*mub*KXZ*b*b/(V0*V0);
-      Cnbdot*b/V0,0,2*mub*KXZ*b*b/(V0*V0),-2*mub*KZ2*b*b/(V0*V0)];
-  
-  
-C2_asym = [CYb, CL, CYp*b/(2*V0), (CYr - 4*mub)*b/(2*V0);
-      0, 0, b/(2*V0), 0;
-      Clb, 0, Clp*b/(2*V0), Clr*b/(2*V0);
-      Cnb, 0, Cnp*b/(2*V0), Cnr*b/(2*V0)];
-  
-  
-C3_asym = [CYda, CYdr;
-       0,0;
-       Clda, Cldr;
-       Cnda, Cndr];
-   
-A_asym = -inv(C1_asym)*C2_asym;
-B_asym = -inv(C1_asym)*C3_asym;
 
 C = eye(4);
 D = 0;
@@ -172,17 +151,38 @@ y_sym = lsim(sys_sym,u_de,t);
 
 
 %Validation
-
 figure(1)
-%Pitch
-%plot(t,y_sym(:,3)+flightdata.Ahrs1_Pitch.data(start,1)*pi/180,flightdata.time.data(1,start:finish)-flightdata.time.data(1,start),flightdata.Ahrs1_Pitch.data(start:finish,1)*pi/180)
 
-%AoA
-plot(t,y_sym(:,2)+flightdata.vane_AOA.data(start,1)*pi/180,flightdata.time.data(1,start:finish)-flightdata.time.data(1,start),flightdata.vane_AOA.data(start:finish,1)*pi/180)
+%Input
+subplot(5,1,1)
+plot(t,flightdata.delta_e.data(start:finish,1)*pi/180,'Color',[0.9100    0.4100    0.1700])
+grid()
+ylabel('\delta_e [rad]')
 
 %u
+subplot(5,1,2)
 plot(t,y_sym(:,1)+flightdata.Dadc1_tas.data(start,1)*0.51444,flightdata.time.data(1,start:finish)-flightdata.time.data(1,start),flightdata.Dadc1_tas.data(start:finish,1)*0.51444)
+grid()
+ylabel('u [rad]')
+legend('Simulation','Flight Test')
+
+%AoA
+subplot(5,1,3)
+plot(t,y_sym(:,2)+flightdata.vane_AOA.data(start,1)*pi/180,flightdata.time.data(1,start:finish)-flightdata.time.data(1,start),flightdata.vane_AOA.data(start:finish,1)*pi/180)
+grid()
+ylabel('\alpha [rad]')
+
+%Pitch
+subplot(5,1,4)
+plot(t,y_sym(:,3)+flightdata.Ahrs1_Pitch.data(start,1)*pi/180,flightdata.time.data(1,start:finish)-flightdata.time.data(1,start),flightdata.Ahrs1_Pitch.data(start:finish,1)*pi/180)
+grid()
+ylabel('\theta [rad]')
 
 %Pitch rate
+subplot(5,1,5)
 plot(t,y_sym(:,4)+flightdata.Ahrs1_bPitchRate.data(start,1)*pi/180,flightdata.time.data(1,start:finish)-flightdata.time.data(1,start),flightdata.Ahrs1_bPitchRate.data(start:finish,1)*pi/180)
+grid()
+ylabel('p [rad/s]')
+xlabel('Time [sec]')
 
+suptitle('Short Period Motion')

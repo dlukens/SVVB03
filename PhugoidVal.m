@@ -6,8 +6,8 @@
 
 load('FlightData.mat')
 
-start = find(flightdata.time.data==3015); % For reference: 3225
-finish = find(flightdata.time.data==3135); % For reference: 3358
+start = find(flightdata.time.data==3015); % For reference: 3225 For flight:3015
+finish = find(flightdata.time.data==3135); % For reference: 3358 For flight: 3135
 
 hp0    = 5030*0.3048;      	  % pressure altitude in the stationary flight condition [m]
 V0     = flightdata.Dadc1_tas.data(start,1)*0.51444;            % true airspeed in the stationary flight condition [m/sec]
@@ -15,7 +15,7 @@ alpha0 = flightdata.vane_AOA.data(start,1)*pi/180 - (-0.0189);       	      % an
 th0    = flightdata.Ahrs1_Pitch.data(start,1)*pi/180;        % pitch angle in the stationary flight condition [rad]
 
 % Aircraft mass
-m      = 6720-(flightdata.lh_engine_FU.data(finish,1)+flightdata.rh_engine_FU.data(finish,1))*0.453592;         	  % mass [kg] Nuestro
+m      = 6720; %-(flightdata.lh_engine_FU.data(finish,1)+flightdata.rh_engine_FU.data(finish,1))*0.453592;         	  % mass [kg] Nuestro
 %m      =  6689.13;         	  % mass [kg] Reference
 
 
@@ -25,8 +25,8 @@ CD0    = 0.0215;            % Zero lift drag coefficient [ ]
 CLa    = 4.4079;            % Slope of CL-alpha curve [ ]
 
 % Longitudinal stability
-Cma    = -0.6615;            % longitudinal stabilty [ ] -0.7249
-Cmde   =  -1.4584;            % elevator effectiveness [ ] -1.496
+Cma    =  -0.6615;            % longitudinal stabilty [ ] -0.7249
+Cmde   =  -1.4584;            % elevator effectiveness [ ] -1.4968
 
 % Aircraft geometry
 
@@ -51,7 +51,8 @@ Temp0  = 288.15;          % temperature at sea level in ISA [K]
 R      = 287.05;          % specific gas constant [m^2/sec^2K]
 g      = 9.81;            % [m/sec^2] (gravity constant)
 
-rho    = rho0*((1+(lambda*hp0/Temp0)))^(-((g/(lambda*R))+1));   % [kg/m^3]  (air density)
+rho    = rho0*((1+(lambda*hp0/Temp0)))^(-((g/(lambda*R))+1));% [kg/m^3]  (air density)
+rho = rho0;
 W      = m*g;				                        % [N]       (aircraft weight)
 
 % Constant values concerning aircraft inertia
@@ -121,7 +122,7 @@ Cndr   =  -0.0939;
 C1_sym = [-2*muc*c/(V0*V0), 0, 0, 0,;
       0, (CZadot - 2*muc)*c/V0, 0, 0;
       0, 0, -c/V0, 0;
-      0, Cmadot*c/V0, 0, -2*muc*KY2*c^2/(V0^2)];
+      0, Cmadot*c/V0, 0, -2*muc*KY2*c*c/(V0*V0)];
 
 
 C2_sym = [CXu/V0, CXa, CZ0, CXq*c/V0;
@@ -150,16 +151,39 @@ u_de = (flightdata.delta_e.data(start:finish,1)*pi/180)';
 y_sym = lsim(sys_sym,u_de,t);
 
 %Validation
-
+%Validation
 figure(1)
-%Pitch
-plot(t,y_sym(:,3)+0.08,flightdata.time.data(1,start:finish)-flightdata.time.data(1,start),flightdata.Ahrs1_Pitch.data(start:finish,1)*pi/180);
 
-%AoA
-% plot(t,y_sym(:,2)+flightdata.vane_AOA.data(start,1)*pi/180,flightdata.time.data(1,start:finish)-flightdata.time.data(1,start),flightdata.vane_AOA.data(start:finish,1)*pi/180)
+%Input
+subplot(5,1,1)
+plot(t,flightdata.delta_e.data(start:finish,1)*pi/180,'Color',[0.9100    0.4100    0.1700])
+grid()
+ylabel('\delta_e [rad]')
 
 %u
-% plot(t,y_sym(:,1)+flightdata.Dadc1_tas.data(start,1)*0.51444,flightdata.time.data(1,start:finish)-flightdata.time.data(1,start),flightdata.Dadc1_tas.data(start:finish,1)*0.51444)
+subplot(5,1,2)
+plot(t,y_sym(:,1)+flightdata.Dadc1_tas.data(start,1)*0.51444,flightdata.time.data(1,start:finish)-flightdata.time.data(1,start),flightdata.Dadc1_tas.data(start:finish,1)*0.51444)
+grid()
+ylabel('u [rad]')
+legend('Simulation','Flight Test')
+
+%AoA
+subplot(5,1,3)
+plot(t,y_sym(:,2)+flightdata.vane_AOA.data(start,1)*pi/180,flightdata.time.data(1,start:finish)-flightdata.time.data(1,start),flightdata.vane_AOA.data(start:finish,1)*pi/180)
+grid()
+ylabel('\alpha [rad]')
+
+%Pitch
+subplot(5,1,4)
+plot(t,y_sym(:,3)+flightdata.Ahrs1_Pitch.data(start,1)*pi/180,flightdata.time.data(1,start:finish)-flightdata.time.data(1,start),flightdata.Ahrs1_Pitch.data(start:finish,1)*pi/180)
+grid()
+ylabel('\theta [rad]')
 
 %Pitch rate
-% plot(t,y_sym(:,4)+flightdata.Ahrs1_bPitchRate.data(start,1)*pi/180,flightdata.time.data(1,start:finish)-flightdata.time.data(1,start),flightdata.Ahrs1_bPitchRate.data(start:finish,1)*pi/180)
+subplot(5,1,5)
+plot(t,y_sym(:,4)+flightdata.Ahrs1_bPitchRate.data(start,1)*pi/180,flightdata.time.data(1,start:finish)-flightdata.time.data(1,start),flightdata.Ahrs1_bPitchRate.data(start:finish,1)*pi/180)
+grid()
+ylabel('p [rad/s]')
+xlabel('Time [sec]')
+
+suptitle('Phugoid Motion')
