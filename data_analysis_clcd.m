@@ -12,9 +12,11 @@ mfused  = readmatrix(file,'Range','I28:I33').'/(2.2046226218488);         %[kg] 
 alpha   = readmatrix(file,'Range','F28:F33').';                           %[deg] CL-CD
 
 gamma   = 1.4;
+dyn_visc= 1.7387652e-05;
 Dinlet  = 0.686;                                                        %[m]
+chord   = 2.0569;                                                       %[m]
 S       = 30;                                                           %[m^2]
-b       = 15.911;                                                           %[m^2]
+b       = 15.911;                                                       %[m^2]
 A       = b^2/S;
 g       = 9.81;                                                         %[m/sec^2] (gravity constant)
 
@@ -93,27 +95,43 @@ alpha0_deg = -CL_vs_alpha(2)/CL_vs_alpha(1);
 alpha0_rad = alpha0_deg*pi/180;
 CLa_deg = CL_vs_alpha(1);
 CLa_rad = CL_vs_alpha(1)*180/pi;
+fitC_L = CLa_deg*alpha+CL_vs_alpha(2);
 
 % plot(C_L.^2,C_D);
 CD_vs_CLsq = polyfit(C_L.^2,C_D,1);
 CD0 = CD_vs_CLsq(2);
 e = 1/(pi*A*CD_vs_CLsq(1));
+fitC_D = CD_vs_CLsq(1).*C_L.^2+CD_vs_CLsq(2);
+
+Re = Vt*chord./dyn_visc;
 
 %plots
 figure(1)
-clvsa = plot(alpha,C_L);
+clvsa = plot(alpha,C_L,'b');
 clvsa.Marker='*';
+hold on
+fit1 = plot(alpha,fitC_L,'--');
+dim = [0.5 0.12 0.5 0.11];
+str = {'Mach range: 0.4148 - 0.2005','Re range: (1.6280 - 0.7848) e07'};
+annotation('textbox',dim,'String',str,'FitBoxToText','on');
 title('Lift Coefficient vs Angle of Attack');
 xlabel('$$\alpha$$ [deg]','Interpreter','Latex');
 ylabel('$$C_L$$ [ ]','Interpreter','Latex');
+legend({'Flight Data','Linear Regression'},'Location','northwest')
 grid on
 
 figure(2)
 clvscd = plot(C_L,C_D,'r');
 clvscd.Marker='*';
+hold on
+fit2 = plot(C_L,fitC_D,'--');
+dim = [0.5 0.12 0.5 0.11];
+str = {'Mach range: 0.4148 - 0.2005','Re range: (1.6280 - 0.7848) e07'};
+annotation('textbox',dim,'String',str,'FitBoxToText','on');
 title('Drag Coefficient vs Lift Coefficient');
 xlabel('$$C_L$$ [ ]','Interpreter','Latex');
 ylabel('$$C_D$$ [ ]','Interpreter','Latex');
+legend({'Flight Data','Lift Squared Regression'},'Location','northwest')
 grid on
 
 

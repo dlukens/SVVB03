@@ -1,5 +1,5 @@
-file = 'RefStationaryData.xlsx';
-% file = '20200305_V1.xlsx';
+% file = 'RefStationaryData.xlsx';
+file = '20200305_V1.xlsx';
 
 %INPUT constants + Vc, hp, mf1, mf2, TAT 
 
@@ -22,8 +22,8 @@ A       = b^2/S;
 g       = 9.80665;                                                         %[m/sec^2] (gravity constant)
 
 % total mass
-minit   = 6689.2;                                  %[kg] reference
-% minit   = 6719.9;                                   %[kg] test
+% minit   = 6689.2;                                  %[kg] reference
+minit   = 6719.9;                                   %[kg] test
 
 % Constant values concerning atmosphere and gravity
 rho0    = 1.2250;          % air density at sea level [kg/m^3] 
@@ -94,7 +94,7 @@ Ve = Vt.*sqrt(rho/rho0);
 Vehat = Ve.*sqrt(ms./(minit-mfused));
 
 % REDUCED ELEVATOR DEFLECTION
-Cmde = -1.71913836452277;
+Cmde = -1.7492;
 CmTc = -0.0064;
 thrust_inputs(:,4) = mfs.*ones(length(Vc),1);
 thrust_inputs(:,5) = mfs.*ones(length(Vc),1);
