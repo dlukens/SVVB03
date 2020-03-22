@@ -15,18 +15,18 @@ alpha0 = flightdata.vane_AOA.data(start,1)*pi/180 - (-0.0189);       	      % an
 th0    = flightdata.Ahrs1_Pitch.data(start,1)*pi/180;        % pitch angle in the stationary flight condition [rad]
 
 % Aircraft mass
-m      = 6720;         	  % mass [kg] Nuestro
+m      = 6720-(flightdata.lh_engine_FU.data(finish,1)+flightdata.rh_engine_FU.data(finish,1))*0.453592;
 %m      =  6689.13;         	  % mass [kg] Reference
 
 
 % aerodynamic properties
-e      = 0.9521;            % Oswald factor [ ]
+e      = 0.9521;            % Oswald factor [ ] 
 CD0    = 0.0215;            % Zero lift drag coefficient [ ]
 CLa    = 4.4079;            % Slope of CL-alpha curve [ ]
 
 % Longitudinal stability
-Cma    = -0.78;            % longitudinal stabilty [ ]
-Cmde   = -1.7197;            % elevator effectiveness [ ]
+Cma    = -0.6615;            % longitudinal stabilty [ ] -0.7249
+Cmde   =  -1.4584;            % elevator effectiveness [ ] -1.496
 
 % Aircraft geometry
 
@@ -175,11 +175,37 @@ y_asym = lsim(sys_asym,[u_da;zeros(finish-start+1,1)'],t);
 %Validation
 
 figure(1)
-%Roll rate
-plot(t,y_asym(:,3),flightdata.time.data(1,start:finish)-flightdata.time.data(1,start),flightdata.Ahrs1_bRollRate.data(start:finish,1)*pi/180)
-%Roll
-%plot(t,y_asym(:,2)+flightdata.Ahrs1_Roll.data(start,1)*pi/180,flightdata.time.data(1,start:finish)-flightdata.time.data(1,start),flightdata.Ahrs1_Roll.data(start:finish,1)*pi/180)
-%Yaw Rate
-%plot(t,y_asym(:,4)+flightdata.Ahrs1_bYawRate.data(start,1)*pi/180,flightdata.time.data(1,start:finish)-flightdata.time.data(1,start),flightdata.Ahrs1_bYawRate.data(start:finish,1)*pi/180)
-
+%Inputs
+subplot(5,1,1)
+plot(t,flightdata.delta_a.data(start:finish,1)*pi/180,'Color',[0.9100    0.4100    0.1700])
 grid()
+ylabel('\delta_a [rad]')
+
+subplot(5,1,2)
+plot(t,flightdata.delta_r.data(start:finish,1)*pi/180,'Color',[0.9100    0.4100    0.1700])
+grid()
+ylabel('\delta_r [rad]')
+
+
+%Roll
+subplot(5,1,3)
+plot(t,y_asym(:,2)+flightdata.Ahrs1_Roll.data(start,1)*pi/180,flightdata.time.data(1,start:finish)-flightdata.time.data(1,start),flightdata.Ahrs1_Roll.data(start:finish,1)*pi/180)
+grid()
+ylabel('Roll [rad]')
+legend('Simulation','Flight Test')
+
+%Roll Rate
+subplot(5,1,4)
+plot(t,y_asym(:,3)+flightdata.Ahrs1_bRollRate.data(start,1)*pi/180,flightdata.time.data(1,start:finish)-flightdata.time.data(1,start),flightdata.Ahrs1_bRollRate.data(start:finish,1)*pi/180)
+grid()
+ylabel('Roll Rate [rad/s]')
+
+
+%Yaw Rate
+subplot(5,1,5)
+plot(t,y_asym(:,4)+flightdata.Ahrs1_bYawRate.data(start,1)*pi/180,flightdata.time.data(1,start:finish)-flightdata.time.data(1,start),flightdata.Ahrs1_bYawRate.data(start:finish,1)*pi/180)
+grid()
+xlabel('Time [sec]')
+ylabel('Yaw Rate [rad/s]')
+
+suptitle('Aperiodic Roll Motion')
