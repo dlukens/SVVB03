@@ -1,5 +1,5 @@
-% file = 'RefStationaryData.xlsx';
-file = '20200305_V1.xlsx';
+file = 'RefStationaryData.xlsx';
+% file = '20200305_V1.xlsx';
 
 %INPUT constants + Vc, hp, mf1, mf2, TAT 
 
@@ -21,8 +21,8 @@ A       = b^2/S;
 g       = 9.81;                                                         %[m/sec^2] (gravity constant)
 
 % total mass
-% minit   = 6689.2;                                  %[kg] reference
-minit   = 6719.9;                                   %[kg] test
+minit   = 6689.2;                                  %[kg] reference
+% minit   = 6719.9;                                   %[kg] test
 
 % Constant values concerning atmosphere and gravity
 rho0    = 1.2250;          % air density at sea level [kg/m^3] 

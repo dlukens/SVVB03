@@ -193,7 +193,7 @@ Cmdelist = [Cmdelist Cmde];
 idx;
 end
 
-surf(Cmalist,Cmdelist,-SDMatrix)
+surf(Cmalist,Cmdelist,-SDMatrix);
 [value, index] = min(SDMatrix(:));
 [row, col] = ind2sub(size(SDMatrix), index);
 value
