@@ -170,7 +170,7 @@ subplot(5,1,3)
 plot(t,y_asym(:,2),flightdata.time.data(1,start:finish)-flightdata.time.data(1,start),flightdata.Ahrs1_Roll.data(start:finish,1)*pi/180)
 grid()
 ylabel('\phi [rad]')
-legend('Reference','Flight Test')
+legend('Simulation','Reference')
 
 %Roll Rate
 subplot(5,1,4)
