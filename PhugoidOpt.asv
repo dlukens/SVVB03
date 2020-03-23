@@ -136,7 +136,7 @@ for idx = startcmde:abs(startcmde-endcmde)/length1:endcmde
    j=0;
    Cmalist=[];
 %%% Symmetric
-for idx2 = startcma:abs(startcma-endcma)/length2:endcma
+for idx2 = -0.5:0.5/length2:endcma
     j = j+1;
     SDlist = [];
     Cma = idx2;
@@ -197,9 +197,8 @@ surf(Cmalist,Cmdelist,-SDMatrix)
 [value, index] = min(SDMatrix(:));
 [row, col] = ind2sub(size(SDMatrix), index);
 value
-Cmdelist(row)
-Cmalist(col)
-
+Cmdelist(col)
+Cmalist(row)
 
 % figure(1)
 % plot(Cmdelist,SDlist)
