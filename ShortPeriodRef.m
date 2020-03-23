@@ -4,10 +4,10 @@
 
 % Stationary flight condition
 
-load('FlightData.mat')
+load('RefData.mat')
 
-start = find(flightdata.time.data==3309);  %For reference: 3540 For flight: 3309
-finish = find(flightdata.time.data==3329); %For reference: 3568 For flight: 3329
+start = find(flightdata.time.data==3540);  %For reference: 3540 For flight: 3309
+finish = find(flightdata.time.data==3568); %For reference: 3568 For flight: 3329
 
 hp0    = 5030*0.3048;      	  % pressure altitude in the stationary flight condition [m]
 V0     = flightdata.Dadc1_tas.data(start,1)*0.51444;            % true airspeed in the stationary flight condition [m/sec]
@@ -164,7 +164,7 @@ subplot(5,1,2)
 plot(t,y_sym(:,1)+flightdata.Dadc1_tas.data(start,1)*0.51444,flightdata.time.data(1,start:finish)-flightdata.time.data(1,start),flightdata.Dadc1_tas.data(start:finish,1)*0.51444)
 grid()
 ylabel('u [rad]')
-legend('Simulation','Flight Test')
+legend('Simulation','Reference')
 
 %AoA
 subplot(5,1,3)

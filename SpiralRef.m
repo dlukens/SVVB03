@@ -4,10 +4,10 @@
 
 % Stationary flight condition
 
-load('FlightData.mat')
+load('RefData.mat')
 
-start = find(flightdata.time.data==3309);  %For reference: 3540 For flight: 3309
-finish = find(flightdata.time.data==3329); %For reference: 3568 For flight: 3329
+start = find(flightdata.time.data==3922); %For flight: 3620 For reference: 3922
+finish = find(flightdata.time.data==4135); %For flight: 3854 For reference: 4135
 
 hp0    = 5030*0.3048;      	  % pressure altitude in the stationary flight condition [m]
 V0     = flightdata.Dadc1_tas.data(start,1)*0.51444;            % true airspeed in the stationary flight condition [m/sec]
@@ -15,7 +15,7 @@ alpha0 = flightdata.vane_AOA.data(start,1)*pi/180 - (-0.0189);       	      % an
 th0    = flightdata.Ahrs1_Pitch.data(start,1)*pi/180;        % pitch angle in the stationary flight condition [rad]
 
 % Aircraft mass
-m      = 6720-(flightdata.lh_engine_FU.data(finish,1)+flightdata.rh_engine_FU.data(finish,1))*0.453592;         	  % mass [kg] Nuestro
+m      = 6720-(flightdata.lh_engine_FU.data(finish,1)+flightdata.rh_engine_FU.data(finish,1))*0.453592;
 %m      =  6689.13;         	  % mass [kg] Reference
 
 
@@ -72,7 +72,7 @@ depsda = 4/(A_asym+2);               % Downwash gradient [ ]
 
 % Lift and drag coefficient
 
-CL = 2*W/(rho*V0*V0*S);               % Lift coefficient [ ]
+CL = 2*W/(rho*V0^2*S);               % Lift coefficient [ ]
 CD = CD0 + (CLa*alpha0)^2/(pi*A_asym*e);  % Drag coefficient [ ]
 
 % Stabiblity derivatives
@@ -138,51 +138,82 @@ C3_sym = [CXde;
 A_sym = -inv(C1_sym)*C2_sym;
 B_sym = -inv(C1_sym)*C3_sym;
 
+%%% Unsymmetric
+
+C1_asym = [(CYbdot - 2*mub)*b/V0,0,0,0;
+      0,-b/(2*V0),0,0;
+      0,0,-2*mub*KX2*b*b/(V0*V0),2*mub*KXZ*b*b/(V0*V0);
+      Cnbdot*b/V0,0,2*mub*KXZ*b*b/(V0*V0),-2*mub*KZ2*b*b/(V0*V0)];
+  
+  
+C2_asym = [CYb, CL, CYp*b/(2*V0), (CYr - 4*mub)*b/(2*V0);
+      0, 0, b/(2*V0), 0;
+      Clb, 0, Clp*b/(2*V0), Clr*b/(2*V0);
+      Cnb, 0, Cnp*b/(2*V0), Cnr*b/(2*V0)];
+  
+  
+C3_asym = [CYda, CYdr;
+       0,0;
+       Clda, Cldr;
+       Cnda, Cndr];
+   
+A_asym = -inv(C1_asym)*C2_asym;
+B_asym = -inv(C1_asym)*C3_asym;
 
 C = eye(4);
 D = 0;
 
 t = flightdata.time.data(1,start:finish)-flightdata.time.data(1,start);
 
-sys_sym = ss(A_sym,B_sym,C,D);
-u_de = (flightdata.delta_e.data(start:finish,1)*pi/180)';
+sys_asym = ss(A_asym,B_asym,C,D);
+u_da = ((flightdata.delta_a.data(start:finish,1)-flightdata.delta_a.data(39010,1))*pi/180)';  %0.275 %0.315 %36001
+u_dr = ((flightdata.delta_r.data(start:finish,1)-flightdata.delta_r.data(start,1))*pi/180)';
+%x0 = [V0,alpha0,th0,0];
 
-y_sym = lsim(sys_sym,u_de,t);
+dr_delta = [];
 
+for i = start:finish
+    dr_new = flightdata.delta_r.data(i+1,1)-flightdata.delta_r.data(i,1);
+    dr_delta = [dr_delta,dr_new];
+end
+
+y_asym = lsim(sys_asym,[u_da;u_dr],t);
 
 %Validation
 figure(1)
-
-%Input
+%Inputs
 subplot(5,1,1)
-plot(t,flightdata.delta_e.data(start:finish,1)*pi/180,'Color',[0.9100    0.4100    0.1700])
+plot(t,flightdata.delta_a.data(start:finish,1)*pi/180,'Color',[0.9100    0.4100    0.1700])
 grid()
-ylabel('\delta_e [rad]')
+ylabel('\delta_a [rad]')
 
-%u
 subplot(5,1,2)
-plot(t,y_sym(:,1)+flightdata.Dadc1_tas.data(start,1)*0.51444,flightdata.time.data(1,start:finish)-flightdata.time.data(1,start),flightdata.Dadc1_tas.data(start:finish,1)*0.51444)
+plot(t,flightdata.delta_r.data(start:finish,1)*pi/180,'Color',[0.9100    0.4100    0.1700])
 grid()
-ylabel('u [rad]')
-legend('Simulation','Flight Test')
+ylabel('\delta_r [rad]')
 
-%AoA
+
+%Roll
 subplot(5,1,3)
-plot(t,y_sym(:,2)+flightdata.vane_AOA.data(start,1)*pi/180,flightdata.time.data(1,start:finish)-flightdata.time.data(1,start),flightdata.vane_AOA.data(start:finish,1)*pi/180)
+plot(t,y_asym(:,2),flightdata.time.data(1,start:finish)-flightdata.time.data(1,start),flightdata.Ahrs1_Roll.data(start:finish,1)*pi/180)
 grid()
-ylabel('\alpha [rad]')
+ylabel('\phi [rad]')
+legend('Simulation','Reference')
 
-%Pitch
+%Roll Rate
 subplot(5,1,4)
-plot(t,y_sym(:,3)+flightdata.Ahrs1_Pitch.data(start,1)*pi/180,flightdata.time.data(1,start:finish)-flightdata.time.data(1,start),flightdata.Ahrs1_Pitch.data(start:finish,1)*pi/180)
-grid()
-ylabel('\theta [rad]')
-
-%Pitch rate
-subplot(5,1,5)
-plot(t,y_sym(:,4)+flightdata.Ahrs1_bPitchRate.data(start,1)*pi/180,flightdata.time.data(1,start:finish)-flightdata.time.data(1,start),flightdata.Ahrs1_bPitchRate.data(start:finish,1)*pi/180)
+plot(t,y_asym(:,3),flightdata.time.data(1,start:finish)-flightdata.time.data(1,start),flightdata.Ahrs1_bRollRate.data(start:finish,1)*pi/180)
 grid()
 ylabel('p [rad/s]')
-xlabel('Time [sec]')
 
-suptitle('Short Period Motion')
+
+%Yaw Rate
+subplot(5,1,5)
+plot(t,y_asym(:,4),flightdata.time.data(1,start:finish)-flightdata.time.data(1,start),flightdata.Ahrs1_bYawRate.data(start:finish,1)*pi/180)
+grid()
+xlabel('Time [sec]')
+ylabel('r [rad/s]')
+
+
+suptitle('Spiral Motion')
+

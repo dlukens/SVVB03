@@ -4,10 +4,10 @@
 
 % Stationary flight condition
 
-load('FlightData.mat')
+load('RefData.mat')
 
-start = find(flightdata.time.data==3309);  %For reference: 3540 For flight: 3309
-finish = find(flightdata.time.data==3329); %For reference: 3568 For flight: 3329
+start = find(flightdata.time.data==3225); % For reference: 3225 For flight:3015
+finish = find(flightdata.time.data==3358); % For reference: 3358 For flight: 3135
 
 hp0    = 5030*0.3048;      	  % pressure altitude in the stationary flight condition [m]
 V0     = flightdata.Dadc1_tas.data(start,1)*0.51444;            % true airspeed in the stationary flight condition [m/sec]
@@ -25,20 +25,20 @@ CD0    = 0.0215;            % Zero lift drag coefficient [ ]
 CLa    = 4.4079;            % Slope of CL-alpha curve [ ]
 
 % Longitudinal stability
-Cma    = -0.6615;            % longitudinal stabilty [ ] -0.7249
-Cmde   =  -1.4584;            % elevator effectiveness [ ] -1.496
+Cma    =  -0.6615;            % longitudinal stabilty [ ] -0.7249
+Cmde   =  -1.4584;            % elevator effectiveness [ ] -1.4968
 
 % Aircraft geometry
 
 S      = 30.00;	          % wing area [m^2]
 Sh     = 0.2*S;           % stabiliser area [m^2]
-Sh_S   = Sh/S;	          % [ ]5
+Sh_S   = Sh/S;	          % [ ]
 lh     = 0.71*5.968;      % tail length [m]
 c      = 2.0569;	  % mean aerodynamic cord [m]
 lh_c   = lh/c;	          % [ ]
 b      = 15.911;	  % wing span [m]
 bh     = 5.791;	          % stabilser span [m]
-A_asym      = b^2/S;           % wing aspect ratio [ ]
+A_asym = b^2/S;           % wing aspect ratio [ ]
 Ah     = bh^2/Sh;         % stabilser aspect ratio [ ]
 Vh_V   = 1;		  % [ ]
 ih     = -2*pi/180;       % stabiliser angle of incidence [rad]
@@ -51,7 +51,8 @@ Temp0  = 288.15;          % temperature at sea level in ISA [K]
 R      = 287.05;          % specific gas constant [m^2/sec^2K]
 g      = 9.81;            % [m/sec^2] (gravity constant)
 
-rho    = rho0*((1+(lambda*hp0/Temp0)))^(-((g/(lambda*R))+1));   % [kg/m^3]  (air density)
+rho    = rho0*((1+(lambda*hp0/Temp0)))^(-((g/(lambda*R))+1));% [kg/m^3]  (air density)
+rho = rho0;
 W      = m*g;				                        % [N]       (aircraft weight)
 
 % Constant values concerning aircraft inertia
@@ -149,7 +150,7 @@ u_de = (flightdata.delta_e.data(start:finish,1)*pi/180)';
 
 y_sym = lsim(sys_sym,u_de,t);
 
-
+%Validation
 %Validation
 figure(1)
 
@@ -164,7 +165,7 @@ subplot(5,1,2)
 plot(t,y_sym(:,1)+flightdata.Dadc1_tas.data(start,1)*0.51444,flightdata.time.data(1,start:finish)-flightdata.time.data(1,start),flightdata.Dadc1_tas.data(start:finish,1)*0.51444)
 grid()
 ylabel('u [rad]')
-legend('Simulation','Flight Test')
+legend('Simulation','Reference')
 
 %AoA
 subplot(5,1,3)
@@ -185,4 +186,4 @@ grid()
 ylabel('p [rad/s]')
 xlabel('Time [sec]')
 
-suptitle('Short Period Motion')
+suptitle('Phugoid Motion')

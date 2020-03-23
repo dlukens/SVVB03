@@ -191,14 +191,14 @@ ylabel('\delta_r [rad]')
 subplot(5,1,3)
 plot(t,y_asym(:,2)+flightdata.Ahrs1_Roll.data(start,1)*pi/180,flightdata.time.data(1,start:finish)-flightdata.time.data(1,start),flightdata.Ahrs1_Roll.data(start:finish,1)*pi/180)
 grid()
-ylabel('Roll [rad]')
+ylabel('\phi [rad]')
 legend('Simulation','Flight Test')
 
 %Roll Rate
 subplot(5,1,4)
 plot(t,y_asym(:,3)+flightdata.Ahrs1_bRollRate.data(start,1)*pi/180,flightdata.time.data(1,start:finish)-flightdata.time.data(1,start),flightdata.Ahrs1_bRollRate.data(start:finish,1)*pi/180)
 grid()
-ylabel('Roll Rate [rad/s]')
+ylabel('p [rad/s]')
 
 
 %Yaw Rate
@@ -206,6 +206,6 @@ subplot(5,1,5)
 plot(t,y_asym(:,4)+flightdata.Ahrs1_bYawRate.data(start,1)*pi/180,flightdata.time.data(1,start:finish)-flightdata.time.data(1,start),flightdata.Ahrs1_bYawRate.data(start:finish,1)*pi/180)
 grid()
 xlabel('Time [sec]')
-ylabel('Yaw Rate [rad/s]')
+ylabel('r [rad/s]')
 
 suptitle('Aperiodic Roll Motion')
