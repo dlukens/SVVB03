@@ -6,8 +6,8 @@
 
 load('RefData.mat')
 
-start = find(flightdata.time.data==3233);
-finish = find(flightdata.time.data==3274);
+start = find(flightdata.time.data==3540); %3538
+finish = find(flightdata.time.data==3580); %3578
 
 hp0    = 5030*0.3048;      	  % pressure altitude in the stationary flight condition [m]
 V0     = flightdata.Dadc1_tas.data(start,1)*0.51444;            % true airspeed in the stationary flight condition [m/sec]
@@ -166,8 +166,8 @@ D = 0;
 t = flightdata.time.data(1,start:finish)-flightdata.time.data(1,start);
 
 sys_asym = ss(A_asym,B_asym,C,D);
-u_da = (-(flightdata.delta_a.data(start:finish,1)-flightdata.delta_a.data(start,1))*pi/180)';
-u_dr = (-(flightdata.delta_r.data(start:finish,1)*pi/180))';
+u_da = ((flightdata.delta_a.data(start:finish,1)-flightdata.delta_a.data(start,1))*pi/180)';
+u_dr = ((flightdata.delta_r.data(start:finish,1)*pi/180))';
 %x0 = [V0,alpha0,th0,0];
 
 y_asym = lsim(sys_asym,[u_da;zeros(finish-start+1,1)'],t);
@@ -177,12 +177,12 @@ y_asym = lsim(sys_asym,[u_da;zeros(finish-start+1,1)'],t);
 figure(1)
 %Inputs
 subplot(5,1,1)
-plot(t,flightdata.delta_a.data(start:finish,1)*pi/180,'Color',[0.9100    0.4100    0.1700])
+plot(t,flightdata.delta_a.data(start:finish,1)*pi/180,'Color', [0 0.5 0])
 grid()
 ylabel('\delta_a [rad]')
 
 subplot(5,1,2)
-plot(t,flightdata.delta_r.data(start:finish,1)*pi/180,'Color',[0.9100    0.4100    0.1700])
+plot(t,flightdata.delta_r.data(start:finish,1)*pi/180,'Color',[0 0.5 0])
 grid()
 ylabel('\delta_r [rad]')
 
@@ -192,7 +192,7 @@ subplot(5,1,3)
 plot(t,y_asym(:,2)+flightdata.Ahrs1_Roll.data(start,1)*pi/180,flightdata.time.data(1,start:finish)-flightdata.time.data(1,start),flightdata.Ahrs1_Roll.data(start:finish,1)*pi/180)
 grid()
 ylabel('\phi [rad]')
-legend('Simulation','Flight Test')
+legend('Simulation','Reference')
 
 %Roll Rate
 subplot(5,1,4)

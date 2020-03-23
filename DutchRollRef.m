@@ -146,7 +146,7 @@ t = flightdata.time.data(1,start:finish)-flightdata.time.data(1,start);
 
 sys_asym = ss(A_asym,B_asym,C,D);
 
-u_da = (-(flightdata.delta_a.data(start:finish,1)-flightdata.delta_a.data(start,1))*pi/180)';
+u_da = ((flightdata.delta_a.data(start:finish,1)-flightdata.delta_a.data(start,1))*pi/180)';
 u_dr = (-(flightdata.delta_r.data(start:finish,1)*pi/180))';
 %x0 = [V0,alpha0,th0,0];
 y_asym = lsim(sys_asym,[u_da;u_dr],t);
@@ -155,12 +155,12 @@ y_asym = lsim(sys_asym,[u_da;u_dr],t);
 figure(1)
 %Inputs
 subplot(5,1,1)
-plot(t,flightdata.delta_a.data(start:finish,1)*pi/180,'Color',[0.9100    0.4100    0.1700])
+plot(t,flightdata.delta_a.data(start:finish,1)*pi/180,'Color',[0    0.5    0])
 grid()
 ylabel('\delta_a [rad]')
 
 subplot(5,1,2)
-plot(t,flightdata.delta_r.data(start:finish,1)*pi/180,'Color',[0.9100    0.4100    0.1700])
+plot(t,flightdata.delta_r.data(start:finish,1)*pi/180,'Color',[0    0.5   0])
 grid()
 ylabel('\delta_r [rad]')
 
