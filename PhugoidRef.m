@@ -183,7 +183,7 @@ ylabel('\theta [rad]')
 subplot(5,1,5)
 plot(t,y_sym(:,4)+flightdata.Ahrs1_bPitchRate.data(start,1)*pi/180,flightdata.time.data(1,start:finish)-flightdata.time.data(1,start),flightdata.Ahrs1_bPitchRate.data(start:finish,1)*pi/180)
 grid()
-ylabel('p [rad/s]')
+ylabel('q [rad/s]')
 xlabel('Time [sec]')
 
 suptitle('Phugoid Motion')

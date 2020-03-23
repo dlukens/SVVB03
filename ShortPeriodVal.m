@@ -182,7 +182,38 @@ ylabel('\theta [rad]')
 subplot(5,1,5)
 plot(t,y_sym(:,4)+flightdata.Ahrs1_bPitchRate.data(start,1)*pi/180,flightdata.time.data(1,start:finish)-flightdata.time.data(1,start),flightdata.Ahrs1_bPitchRate.data(start:finish,1)*pi/180)
 grid()
-ylabel('p [rad/s]')
+ylabel('q [rad/s]')
 xlabel('Time [sec]')
 
 suptitle('Short Period Motion')
+
+%Error
+figure(2)
+
+
+subplot(4,1,1)
+error1 = ((y_sym(:,1)+flightdata.Dadc1_tas.data(start,1)*0.51444)-flightdata.Dadc1_tas.data(start:finish,1)*0.51444)/(max(flightdata.Dadc1_tas.data(start:finish,1)*0.51444)-min(flightdata.Dadc1_tas.data(start:finish,1)*0.51444))*100;
+plot(t,error1)
+grid()
+ylabel('Error in u [%]')
+
+subplot(4,1,2)
+error2 = ((y_sym(:,2)+flightdata.vane_AOA.data(start,1)*pi/180)-flightdata.vane_AOA.data(start:finish,1)*pi/180)/(max(flightdata.vane_AOA.data(start:finish,1)*pi/180)-min(flightdata.vane_AOA.data(start:finish,1)*pi/180))*100;
+plot(t,error2)
+grid()
+ylabel('Error in \alpha [%]')
+
+subplot(4,1,3)
+error3 = ((y_sym(:,3)+flightdata.Ahrs1_Pitch.data(start,1)*pi/180)-flightdata.Ahrs1_Pitch.data(start:finish,1)*pi/180)/(max(flightdata.Ahrs1_Pitch.data(start:finish,1)*pi/180)-min(flightdata.Ahrs1_Pitch.data(start:finish,1)*pi/180))*100;
+plot(t,error3)
+grid()
+ylabel('Error in \theta [%]')
+
+subplot(4,1,4)
+error4 = ((y_sym(:,4)+flightdata.Ahrs1_bPitchRate.data(start,1)*pi/180)-flightdata.Ahrs1_bPitchRate.data(start:finish,1)*pi/180)/(max(flightdata.Ahrs1_bPitchRate.data(start:finish,1)*pi/180)-min(flightdata.Ahrs1_bPitchRate.data(start:finish,1)*pi/180))*100;
+plot(t,error4)
+grid()
+ylabel('Error in q [%]')
+xlabel('Time [sec]')
+
+suptitle('Short Period Motion Error')

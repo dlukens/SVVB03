@@ -187,3 +187,28 @@ xlabel('Time [sec]')
 ylabel('r [rad/s]')
 
 suptitle('Dutch Roll Motion')
+
+%Error
+figure(2)
+
+
+subplot(3,1,1)
+error1 = ((y_asym(:,2))-flightdata.Ahrs1_Roll.data(start:finish,1)*pi/180)/(max(flightdata.Ahrs1_Roll.data(start:finish,1)*pi/180)-min(flightdata.Ahrs1_Roll.data(start:finish,1)*pi/180))*100;
+plot(t,error1)
+grid()
+ylabel('Error in \phi [%]')
+
+subplot(3,1,2)
+error2 = ((y_asym(:,3))-flightdata.Ahrs1_bRollRate.data(start:finish,1)*pi/180)/(max(flightdata.Ahrs1_bRollRate.data(start:finish,1)*pi/180)-min(flightdata.Ahrs1_bRollRate.data(start:finish,1)*pi/180))*100;
+plot(t,error2)
+grid()
+ylabel('Error in p [%]')
+
+subplot(3,1,3)
+error3 = ((y_asym(:,4))-flightdata.Ahrs1_bYawRate.data(start:finish,1)*pi/180)/(max(flightdata.Ahrs1_bYawRate.data(start:finish,1)*pi/180)-min(flightdata.Ahrs1_bYawRate.data(start:finish,1)*pi/180))*100;
+plot(t,error3)
+grid()
+ylabel('Error in r [%]')
+xlabel('Time [sec]')
+
+suptitle('Dutch Roll Motion Error')
