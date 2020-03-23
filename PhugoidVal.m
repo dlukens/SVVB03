@@ -218,3 +218,6 @@ ylabel('Error in q [%]')
 xlabel('Time [sec]')
 
 suptitle('Phugoid Motion Error')
+
+
+damp(sys_sym)
