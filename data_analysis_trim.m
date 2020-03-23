@@ -94,7 +94,7 @@ Ve = Vt.*sqrt(rho/rho0);
 Vehat = Ve.*sqrt(ms./(minit-mfused));
 
 % REDUCED ELEVATOR DEFLECTION
-Cmde = -1.7492;
+Cmde = -1.4584;
 CmTc = -0.0064;
 thrust_inputs(:,4) = mfs.*ones(length(Vc),1);
 thrust_inputs(:,5) = mfs.*ones(length(Vc),1);
