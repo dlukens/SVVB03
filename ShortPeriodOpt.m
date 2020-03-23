@@ -1,13 +1,13 @@
 % Citation 550 - Linear simulation
-%Dutch Roll
+% Aperiodic Roll
 % xcg = 0.25*c
 
 % Stationary flight condition
+
 load('FlightData.mat')
 
-start = find(flightdata.time.data==3407);
-finish = find(flightdata.time.data==3430);
-
+start = find(flightdata.time.data==3309);
+finish = find(flightdata.time.data==3329);
 
 hp0    = 5030*0.3048;      	  % pressure altitude in the stationary flight condition [m]
 V0     = flightdata.Dadc1_tas.data(start,1)*0.51444;            % true airspeed in the stationary flight condition [m/sec]
@@ -15,7 +15,7 @@ alpha0 = flightdata.vane_AOA.data(start,1)*pi/180 - (-0.0189);       	      % an
 th0    = flightdata.Ahrs1_Pitch.data(start,1)*pi/180;        % pitch angle in the stationary flight condition [rad]
 
 % Aircraft mass
-m      = 6720-(flightdata.lh_engine_FU.data(finish,1)+flightdata.rh_engine_FU.data(finish,1))*0.453592;
+m      = 6720-(flightdata.lh_engine_FU.data(finish,1)+flightdata.rh_engine_FU.data(finish,1))*0.453592;         	  % mass [kg] Nuestro
 %m      =  6689.13;         	  % mass [kg] Reference
 
 
@@ -72,7 +72,7 @@ depsda = 4/(A_asym+2);               % Downwash gradient [ ]
 
 % Lift and drag coefficient
 
-CL = 2*W/(rho*V0^2*S);               % Lift coefficient [ ]
+CL = 2*W/(rho*V0*V0*S);               % Lift coefficient [ ]
 CD = CD0 + (CLa*alpha0)^2/(pi*A_asym*e);  % Drag coefficient [ ]
 
 % Stabiblity derivatives
@@ -116,74 +116,75 @@ Cnda   =  -0.0120;
 Cndr   =  -0.0939;
 
 
-%%% Unsymmetric
+length1 = 10;
+length2 = 10;
+SDlist = [];
+Cmdelist = [];
+Cmalist = [];
+SDMatrix=zeros(length1,length2);
+i = 0;
 
-C1_asym = [(CYbdot - 2*mub)*b/V0,0,0,0;
-      0,-b/(2*V0),0,0;
-      0,0,-2*mub*KX2*b*b/(V0*V0),2*mub*KXZ*b*b/(V0*V0);
-      Cnbdot*b/V0,0,2*mub*KXZ*b*b/(V0*V0),-2*mub*KZ2*b*b/(V0*V0)];
-  
-  
-C2_asym = [CYb, CL, CYp*b/(2*V0), (CYr - 4*mub)*b/(2*V0);
-      0, 0, b/(2*V0), 0;
-      Clb, 0, Clp*b/(2*V0), Clr*b/(2*V0);
-      Cnb, 0, Cnp*b/(2*V0), Cnr*b/(2*V0)];
-  
-  
-C3_asym = [CYda, CYdr;
-       0,0;
-       Clda, Cldr;
-       Cnda, Cndr];
-   
-A_asym = -inv(C1_asym)*C2_asym;
-B_asym = -inv(C1_asym)*C3_asym;
+for idx = -1.8:1.8/length1:0
+   Cmde = idx; 
+   i = i+1;
+   j=0;
+   Cmalist=[];
+%%% Symmetric
+for idx2 = -1:0.9/length2:-0.1
+    j = j+1;
+    SDlist = [];
+    Cma = idx2;
+    C1_sym = [-2*muc*c/(V0*V0), 0, 0, 0,;
+        0, (CZadot - 2*muc)*c/V0, 0, 0;
+        0, 0, -c/V0, 0;
+        0, Cmadot*c/V0, 0, -2*muc*KY2*c*c/(V0*V0)];
+    
+    
+    C2_sym = [CXu/V0, CXa, CZ0, CXq*c/V0;
+        CZu/V0, CZa, -CX0, (CZq + 2*muc)*c/V0;
+        0,0,0,c/V0;
+        Cmu/V0, Cma, 0, Cmq*c/V0];
+    
+    
+    C3_sym = [CXde;
+        CZde;
+        0;
+        Cmde];
+    
+    A_sym = -inv(C1_sym)*C2_sym;
+    B_sym = -inv(C1_sym)*C3_sym;
+    
+    
+    C = eye(4);
+    D = 0;
+    
+    t = flightdata.time.data(1,start:finish)-flightdata.time.data(1,start);
+    
+    sys_sym = ss(A_sym,B_sym,C,D);
+    u_de = (flightdata.delta_e.data(start:finish,1)*pi/180)';
+    
+    y_sym = lsim(sys_sym,u_de,t);
+    
+    error1 = ((y_sym(:,1)+flightdata.Dadc1_tas.data(start,1)*0.51444)-flightdata.Dadc1_tas.data(start:finish,1)*0.51444)/(max(flightdata.Dadc1_tas.data(start:finish,1)*0.51444)-min(flightdata.Dadc1_tas.data(start:finish,1)*0.51444));
+    % error1 = (y_sym(:,1)+flightdata.Dadc1_tas.data(start,1)*0.51444)-flightdata.Dadc1_tas.data(start:finish,1)*0.51444;
+    variance1 = (dot(error1,error1))/length(y_sym(:,1));
+    error2 = ((y_sym(:,2)+flightdata.vane_AOA.data(start,1)*pi/180)-flightdata.vane_AOA.data(start:finish,1)*pi/180)/(max(flightdata.vane_AOA.data(start:finish,1)*pi/180)-min(flightdata.vane_AOA.data(start:finish,1)*pi/180));
+    % error2 = (y_sym(:,2)+flightdata.vane_AOA.data(start,1)*pi/180)-flightdata.vane_AOA.data(start:finish,1)*pi/180;
+    variance2 = (dot(error2,error2))/length(y_sym(:,1));
+    variance2 = 0;
+    error3 = ((y_sym(:,3)+flightdata.Ahrs1_Pitch.data(start,1)*pi/180)-flightdata.Ahrs1_Pitch.data(start:finish,1)*pi/180)/(max(flightdata.Ahrs1_Pitch.data(start:finish,1)*pi/180)-min(flightdata.Ahrs1_Pitch.data(start:finish,1)*pi/180));
+    % error3 = (y_sym(:,3)+flightdata.Ahrs1_Pitch.data(start,1)*pi/180)-flightdata.Ahrs1_Pitch.data(start:finish,1)*pi/180;
+    variance3 = (dot(error3,error3))/length(y_sym(:,1));
+    error4 = ((y_sym(:,4)+flightdata.Ahrs1_bPitchRate.data(start,1)*pi/180)-flightdata.Ahrs1_bPitchRate.data(start:finish,1)*pi/180)/(max(flightdata.Ahrs1_bPitchRate.data(start:finish,1)*pi/180)-min(flightdata.Ahrs1_bPitchRate.data(start:finish,1)*pi/180));
+    % error4 = (y_sym(:,4)+flightdata.Ahrs1_bPitchRate.data(start,1)*pi/180)-flightdata.Ahrs1_bPitchRate.data(start:finish,1)*pi/180;
+    variance4 = (dot(error4,error4))/length(y_sym(:,1));
+    
+    SD = sqrt(variance1+variance2+variance3+variance4);
+    Cmalist = [Cmalist Cma];
+    SDMatrix(i,j) = SD;
+end
+Cmdelist = [Cmdelist Cmde];
+idx
+end
 
-C = eye(4);
-D = 0;
-
-
-t = flightdata.time.data(1,start:finish)-flightdata.time.data(1,start);
-
-sys_asym = ss(A_asym,B_asym,C,D);
-
-u_da = (-(flightdata.delta_a.data(start:finish,1)-flightdata.delta_a.data(start,1))*pi/180)';
-u_dr = (-(flightdata.delta_r.data(start:finish,1)*pi/180))';
-%x0 = [V0,alpha0,th0,0];
-y_asym = lsim(sys_asym,[u_da;u_dr],t);
-
-%Validation
-figure(1)
-%Inputs
-subplot(5,1,1)
-plot(t,flightdata.delta_a.data(start:finish,1)*pi/180,'Color',[0.9100    0.4100    0.1700])
-grid()
-ylabel('\delta_a [rad]')
-
-subplot(5,1,2)
-plot(t,flightdata.delta_r.data(start:finish,1)*pi/180,'Color',[0.9100    0.4100    0.1700])
-grid()
-ylabel('\delta_r [rad]')
-
-
-%Roll
-subplot(5,1,3)
-plot(t,y_asym(:,2),flightdata.time.data(1,start:finish)-flightdata.time.data(1,start),flightdata.Ahrs1_Roll.data(start:finish,1)*pi/180)
-grid()
-ylabel('Roll [rad]')
-legend('Simulation','Flight Test')
-
-%Roll Rate
-subplot(5,1,4)
-plot(t,y_asym(:,3),flightdata.time.data(1,start:finish)-flightdata.time.data(1,start),flightdata.Ahrs1_bRollRate.data(start:finish,1)*pi/180)
-grid()
-ylabel('Roll Rate [rad/s]')
-
-
-%Yaw Rate
-subplot(5,1,5)
-plot(t,y_asym(:,4),flightdata.time.data(1,start:finish)-flightdata.time.data(1,start),flightdata.Ahrs1_bYawRate.data(start:finish,1)*pi/180)
-grid()
-xlabel('Time [sec]')
-ylabel('Yaw Rate [rad/s]')
-
-suptitle('Dutch Roll Motion')
+surf(Cmalist,Cmdelist,-SDMatrix)

@@ -15,7 +15,7 @@ alpha0 = flightdata.vane_AOA.data(start,1)*pi/180 - (-0.0189);       	      % an
 th0    = flightdata.Ahrs1_Pitch.data(start,1)*pi/180;        % pitch angle in the stationary flight condition [rad]
 
 % Aircraft mass
-m      = 6720; %-(flightdata.lh_engine_FU.data(finish,1)+flightdata.rh_engine_FU.data(finish,1))*0.453592;         	  % mass [kg] Nuestro
+m      = 6720-(flightdata.lh_engine_FU.data(finish,1)+flightdata.rh_engine_FU.data(finish,1))*0.453592;         	  % mass [kg] Nuestro
 %m      =  6689.13;         	  % mass [kg] Reference
 
 
