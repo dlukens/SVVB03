@@ -156,7 +156,7 @@ figure(1)
 
 %Input
 subplot(5,1,1)
-plot(t,flightdata.delta_e.data(start:finish,1)*pi/180,'Color',[0.9100    0.4100    0.1700])
+plot(t,flightdata.delta_e.data(start:finish,1)*pi/180,'Color',[0    0.5    0])
 grid()
 ylabel('\delta_e [rad]')
 
@@ -164,7 +164,7 @@ ylabel('\delta_e [rad]')
 subplot(5,1,2)
 plot(t,y_sym(:,1)+flightdata.Dadc1_tas.data(start,1)*0.51444,flightdata.time.data(1,start:finish)-flightdata.time.data(1,start),flightdata.Dadc1_tas.data(start:finish,1)*0.51444)
 grid()
-ylabel('u [rad]')
+ylabel('u [m/s]')
 legend('Simulation','Reference')
 
 %AoA
