@@ -116,8 +116,8 @@ Cnda   =  -0.0120;
 Cndr   =  -0.0939;
 
 
-length1 = 10;
-length2 = 10;
+length1 = 100;
+length2 = 100;
 SDlist = [];
 Cmdelist = [];
 Cmalist = [];
@@ -188,3 +188,8 @@ idx
 end
 
 surf(Cmalist,Cmdelist,-SDMatrix)
+[value, index] = min(SDMatrix(:));
+[row, col] = ind2sub(size(SDMatrix), index);
+value
+Cmdelist(row)
+Cmalist(col)
