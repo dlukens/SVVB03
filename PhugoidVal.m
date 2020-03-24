@@ -9,6 +9,9 @@ load('FlightData.mat')
 start = find(flightdata.time.data==3015); % For reference: 3225 For flight:3015
 finish = find(flightdata.time.data==3135); % For reference: 3358 For flight: 3135
 
+%For damp and eigenvalues: V0     = 90; alpha0 = 5.5*pi/180+0.0189; th0
+%= 0; and the mass
+
 hp0    = 5030*0.3048;      	  % pressure altitude in the stationary flight condition [m]
 V0     = flightdata.Dadc1_tas.data(start,1)*0.51444;            % true airspeed in the stationary flight condition [m/sec]
 alpha0 = flightdata.vane_AOA.data(start,1)*pi/180 - (-0.0189);       	      % angle of attack in the stationary flight condition [rad]
@@ -25,7 +28,7 @@ CD0    = 0.0215;            % Zero lift drag coefficient [ ]
 CLa    = 4.4079;            % Slope of CL-alpha curve [ ]
 
 % Longitudinal stability
-Cma    =  -0.6615;            % longitudinal stabilty [ ] -0.7249
+Cma    = -0.6615;            % longitudinal stabilty [ ] -0.7249
 Cmde   =  -1.4584;            % elevator effectiveness [ ] -1.4968
 
 % Aircraft geometry
@@ -80,7 +83,7 @@ CD = CD0 + (CLa*alpha0)^2/(pi*A_asym*e);  % Drag coefficient [ ]
 
 CX0    = W*sin(th0)/(0.5*rho*V0^2*S);
 CXu    = -0.095  ;
-CXa    = -0.47966;
+CXa    = +0.47966;
 CXadot = +0.08330;
 CXq    = -0.28170;
 CXde   = -0.03728;
@@ -186,7 +189,7 @@ grid()
 ylabel('q [rad/s]')
 xlabel('Time [sec]')
 
-suptitle('Phugoid Motion')
+suptitle(['Phugoid Motion, m = ',num2str(m),' kg'])
 
 %Error
 figure(2)
@@ -195,29 +198,40 @@ figure(2)
 subplot(4,1,1)
 error1 = ((y_sym(:,1)+flightdata.Dadc1_tas.data(start,1)*0.51444)-flightdata.Dadc1_tas.data(start:finish,1)*0.51444)/(max(flightdata.Dadc1_tas.data(start:finish,1)*0.51444)-min(flightdata.Dadc1_tas.data(start:finish,1)*0.51444))*100;
 plot(t,error1)
+ylim([-80 60])
 grid()
 ylabel('Error in u [%]')
 
 subplot(4,1,2)
 error2 = ((y_sym(:,2)+flightdata.vane_AOA.data(start,1)*pi/180)-flightdata.vane_AOA.data(start:finish,1)*pi/180)/(max(flightdata.vane_AOA.data(start:finish,1)*pi/180)-min(flightdata.vane_AOA.data(start:finish,1)*pi/180))*100;
 plot(t,error2)
+ylim([-80 60])
 grid()
 ylabel('Error in \alpha [%]')
 
 subplot(4,1,3)
 error3 = ((y_sym(:,3)+flightdata.Ahrs1_Pitch.data(start,1)*pi/180)-flightdata.Ahrs1_Pitch.data(start:finish,1)*pi/180)/(max(flightdata.Ahrs1_Pitch.data(start:finish,1)*pi/180)-min(flightdata.Ahrs1_Pitch.data(start:finish,1)*pi/180))*100;
 plot(t,error3)
+ylim([-80 60])
 grid()
 ylabel('Error in \theta [%]')
 
 subplot(4,1,4)
 error4 = ((y_sym(:,4)+flightdata.Ahrs1_bPitchRate.data(start,1)*pi/180)-flightdata.Ahrs1_bPitchRate.data(start:finish,1)*pi/180)/(max(flightdata.Ahrs1_bPitchRate.data(start:finish,1)*pi/180)-min(flightdata.Ahrs1_bPitchRate.data(start:finish,1)*pi/180))*100;
 plot(t,error4)
+ylim([-80 60])
 grid()
 ylabel('Error in q [%]')
 xlabel('Time [sec]')
 
 suptitle('Phugoid Motion Error')
 
+figure(3)
+plot(t,error1,t,error2,t,error3,t,error4)
+ylabel('Error [%]')
+xlabel('Time [sec]')
+legend('u','\alpha','\theta','q')
+grid()
+title('Phugoid Motion Error')
 
 damp(sys_sym)

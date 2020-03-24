@@ -12,7 +12,7 @@ finish = find(flightdata.time.data==3430);
 hp0    = 5030*0.3048;      	  % pressure altitude in the stationary flight condition [m]
 V0     = flightdata.Dadc1_tas.data(start,1)*0.51444;            % true airspeed in the stationary flight condition [m/sec]
 alpha0 = flightdata.vane_AOA.data(start,1)*pi/180 - (-0.0189);       	      % angle of attack in the stationary flight condition [rad]
-th0    = flightdata.Ahrs1_Pitch.data(start,1)*pi/180;        % pitch angle in the stationary flight condition [rad]
+th0   = flightdata.Ahrs1_Pitch.data(start,1)*pi/180;        % pitch angle in the stationary flight condition [rad]
 
 % Aircraft mass
 m      = 6720-(flightdata.lh_engine_FU.data(finish,1)+flightdata.rh_engine_FU.data(finish,1))*0.453592;
@@ -79,7 +79,7 @@ CD = CD0 + (CLa*alpha0)^2/(pi*A_asym*e);  % Drag coefficient [ ]
 
 CX0    = W*sin(th0)/(0.5*rho*V0^2*S);
 CXu    = -0.095  ;
-CXa    = -0.47966;
+CXa    = +0.47966;
 CXadot = +0.08330;
 CXq    = -0.28170;
 CXde   = -0.03728;
@@ -186,7 +186,7 @@ grid()
 xlabel('Time [sec]')
 ylabel('r [rad/s]')
 
-suptitle('Dutch Roll Motion')
+suptitle(['Dutch Roll Motion, m = ',num2str(m),' kg'])
 
 %Error
 figure(2)
@@ -196,19 +196,24 @@ subplot(3,1,1)
 error1 = ((y_asym(:,2))-flightdata.Ahrs1_Roll.data(start:finish,1)*pi/180)/(max(flightdata.Ahrs1_Roll.data(start:finish,1)*pi/180)-min(flightdata.Ahrs1_Roll.data(start:finish,1)*pi/180))*100;
 plot(t,error1)
 grid()
+ylim([-60 40])
 ylabel('Error in \phi [%]')
 
 subplot(3,1,2)
 error2 = ((y_asym(:,3))-flightdata.Ahrs1_bRollRate.data(start:finish,1)*pi/180)/(max(flightdata.Ahrs1_bRollRate.data(start:finish,1)*pi/180)-min(flightdata.Ahrs1_bRollRate.data(start:finish,1)*pi/180))*100;
 plot(t,error2)
 grid()
+ylim([-60 40])
 ylabel('Error in p [%]')
 
 subplot(3,1,3)
 error3 = ((y_asym(:,4))-flightdata.Ahrs1_bYawRate.data(start:finish,1)*pi/180)/(max(flightdata.Ahrs1_bYawRate.data(start:finish,1)*pi/180)-min(flightdata.Ahrs1_bYawRate.data(start:finish,1)*pi/180))*100;
 plot(t,error3)
 grid()
+ylim([-60 40])
 ylabel('Error in r [%]')
 xlabel('Time [sec]')
 
 suptitle('Dutch Roll Motion Error')
+
+damp(sys_asym)

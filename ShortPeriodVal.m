@@ -79,7 +79,7 @@ CD = CD0 + (CLa*alpha0)^2/(pi*A_asym*e);  % Drag coefficient [ ]
 
 CX0    = W*sin(th0)/(0.5*rho*V0^2*S);
 CXu    = -0.095  ;
-CXa    = -0.47966;
+CXa    = +0.47966;
 CXadot = +0.08330;
 CXq    = -0.28170;
 CXde   = -0.03728;
@@ -185,7 +185,7 @@ grid()
 ylabel('q [rad/s]')
 xlabel('Time [sec]')
 
-suptitle('Short Period Motion')
+suptitle(['Short Period Motion, m = ',num2str(m),' kg'])
 
 %Error
 figure(2)
@@ -194,26 +194,38 @@ figure(2)
 subplot(4,1,1)
 error1 = ((y_sym(:,1)+flightdata.Dadc1_tas.data(start,1)*0.51444)-flightdata.Dadc1_tas.data(start:finish,1)*0.51444)/(max(flightdata.Dadc1_tas.data(start:finish,1)*0.51444)-min(flightdata.Dadc1_tas.data(start:finish,1)*0.51444))*100;
 plot(t,error1)
+ylim([-100 40])
 grid()
 ylabel('Error in u [%]')
 
 subplot(4,1,2)
 error2 = ((y_sym(:,2)+flightdata.vane_AOA.data(start,1)*pi/180)-flightdata.vane_AOA.data(start:finish,1)*pi/180)/(max(flightdata.vane_AOA.data(start:finish,1)*pi/180)-min(flightdata.vane_AOA.data(start:finish,1)*pi/180))*100;
 plot(t,error2)
+ylim([-100 40])
 grid()
 ylabel('Error in \alpha [%]')
 
 subplot(4,1,3)
 error3 = ((y_sym(:,3)+flightdata.Ahrs1_Pitch.data(start,1)*pi/180)-flightdata.Ahrs1_Pitch.data(start:finish,1)*pi/180)/(max(flightdata.Ahrs1_Pitch.data(start:finish,1)*pi/180)-min(flightdata.Ahrs1_Pitch.data(start:finish,1)*pi/180))*100;
 plot(t,error3)
+ylim([-100 40])
 grid()
 ylabel('Error in \theta [%]')
 
 subplot(4,1,4)
 error4 = ((y_sym(:,4)+flightdata.Ahrs1_bPitchRate.data(start,1)*pi/180)-flightdata.Ahrs1_bPitchRate.data(start:finish,1)*pi/180)/(max(flightdata.Ahrs1_bPitchRate.data(start:finish,1)*pi/180)-min(flightdata.Ahrs1_bPitchRate.data(start:finish,1)*pi/180))*100;
 plot(t,error4)
+ylim([-100 40])
 grid()
 ylabel('Error in q [%]')
 xlabel('Time [sec]')
 
 suptitle('Short Period Motion Error')
+
+figure(3)
+plot(t,error1,t,error2,t,error3,t,error4)
+ylabel('Error [%]')
+xlabel('Time [sec]')
+legend('u','\alpha','\theta','q')
+grid()
+title('Short Period Motion Error')

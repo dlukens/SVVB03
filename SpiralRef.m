@@ -79,7 +79,7 @@ CD = CD0 + (CLa*alpha0)^2/(pi*A_asym*e);  % Drag coefficient [ ]
 
 CX0    = W*sin(th0)/(0.5*rho*V0^2*S);
 CXu    = -0.095  ;
-CXa    = -0.47966;
+CXa    = +0.47966;
 CXadot = +0.08330;
 CXq    = -0.28170;
 CXde   = -0.03728;
@@ -195,7 +195,7 @@ ylabel('\delta_r [rad]')
 
 %Roll
 subplot(5,1,3)
-plot(t,y_asym(:,2),flightdata.time.data(1,start:finish)-flightdata.time.data(1,start),flightdata.Ahrs1_Roll.data(start:finish,1)*pi/180)
+plot(t,y_asym(:,2)+flightdata.Ahrs1_Roll.data(start,1)*pi/180,flightdata.time.data(1,start:finish)-flightdata.time.data(1,start),flightdata.Ahrs1_Roll.data(start:finish,1)*pi/180)
 grid()
 ylabel('\phi [rad]')
 legend('Simulation','Reference')
@@ -209,7 +209,7 @@ ylabel('p [rad/s]')
 
 %Yaw Rate
 subplot(5,1,5)
-plot(t,y_asym(:,4),flightdata.time.data(1,start:finish)-flightdata.time.data(1,start),flightdata.Ahrs1_bYawRate.data(start:finish,1)*pi/180)
+plot(t,y_asym(:,4)+flightdata.Ahrs1_bYawRate.data(start,1)*pi/180,flightdata.time.data(1,start:finish)-flightdata.time.data(1,start),flightdata.Ahrs1_bYawRate.data(start:finish,1)*pi/180)
 grid()
 xlabel('Time [sec]')
 ylabel('r [rad/s]')
